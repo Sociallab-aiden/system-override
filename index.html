@@ -1,11 +1,836 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>System Override</title>
-  </head>
-  <body>
-    <h1>Hallo Welt!</h1>
-    <p>Meine GitHub Pages Seite funktioniert.</p>
-  </body>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SYSTEM OVERRIDE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
+  :root {
+    --bg:#030810;--bg2:#060f1e;--panel:#0a1628;--border:#0f3460;
+    --accent:#00d4ff;--accent2:#ff3e6c;--accent3:#39ff14;
+    --text:#c8e0f4;--muted:#4a6080;--warn:#ffb800;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);
+    pointer-events:none;z-index:9999;}
+  body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+    background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
+    background-size:40px 40px;pointer-events:none;z-index:0;}
+
+  .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:20px 20px 80px;animation:fadeIn 0.4s ease;}
+  .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Back button – unobtrusive, fixed bottom left */
+  .back-btn{position:fixed;bottom:20px;left:20px;z-index:500;
+    font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted);
+    background:transparent;border:1px solid var(--muted);border-radius:3px;
+    padding:7px 12px;cursor:pointer;transition:all 0.2s;opacity:0.5;}
+  .back-btn:hover{opacity:1;color:var(--accent);border-color:var(--accent);}
+
+  .container{width:100%;max-width:750px;background:var(--panel);border:1px solid var(--border);
+    border-radius:4px;padding:32px;position:relative;
+    box-shadow:0 0 40px rgba(0,212,255,0.06),inset 0 0 40px rgba(0,0,0,0.4);}
+  .container::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+  .corner{position:absolute;width:12px;height:12px;border-color:var(--accent);border-style:solid;}
+  .corner.tl{top:-1px;left:-1px;border-width:2px 0 0 2px;}
+  .corner.tr{top:-1px;right:-1px;border-width:2px 2px 0 0;}
+  .corner.bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
+  .corner.br{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+
+  /* ── INTRO / AIDEN screen ── */
+  .aiden-logo{width:min(260px,60vw);height:min(260px,60vw);margin:0 auto 24px;display:block;
+    filter:drop-shadow(0 0 24px rgba(0,212,255,0.25));}
+
+  /* Subtitle box */
+  .subtitle-box{background:rgba(0,0,0,0.6);border:1px solid var(--border);border-radius:4px;
+    padding:14px 18px;min-height:64px;margin:16px 0;font-size:14px;line-height:1.7;
+    font-family:'Exo 2',sans-serif;color:var(--text);transition:all 0.3s;}
+  .subtitle-box .subtitle-line{display:none;}
+  .subtitle-box .subtitle-line.active{display:block;}
+  .subtitle-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent2);
+    letter-spacing:0.15em;margin-bottom:8px;}
+
+  /* Audio player */
+  .audio-player{display:flex;align-items:center;gap:12px;padding:12px 16px;
+    background:rgba(0,212,255,0.04);border:1px solid var(--border);border-radius:3px;
+    margin-bottom:16px;}
+  .audio-btn{width:36px;height:36px;border-radius:50%;background:var(--accent);border:none;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    font-size:13px;color:var(--bg);flex-shrink:0;transition:all 0.2s;}
+  .audio-btn:hover{background:#00eeff;box-shadow:0 0 12px rgba(0,212,255,0.4);}
+  .audio-btn.playing{background:var(--accent2);}
+  .audio-info{flex:1;}
+  .audio-title{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);
+    letter-spacing:0.1em;margin-bottom:4px;}
+  .audio-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+  .audio-progress-fill{height:100%;background:var(--accent);width:0%;transition:width 0.5s linear;border-radius:2px;}
+
+  h2{font-family:'Orbitron',monospace;font-size:16px;color:var(--accent);letter-spacing:0.1em;
+    text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+  h2::after{content:'';flex:1;height:1px;background:var(--border);}
+  .level-badge{font-family:'Share Tech Mono',monospace;font-size:10px;background:rgba(0,212,255,0.1);
+    border:1px solid var(--accent);color:var(--accent);padding:3px 10px;border-radius:2px;letter-spacing:0.1em;}
+
+  .maya-box{background:rgba(0,212,255,0.04);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;
+    padding:16px 52px 16px 20px;margin-bottom:24px;font-style:italic;line-height:1.7;position:relative;}
+  .maya-box::before{content:'MAYA // NACHRICHT';display:block;font-family:'Share Tech Mono',monospace;
+    font-size:9px;color:var(--accent);letter-spacing:0.15em;margin-bottom:8px;font-style:normal;}
+  .maya-avatar{width:32px;height:32px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),#0066ff);
+    display:inline-flex;align-items:center;justify-content:center;font-size:14px;
+    position:absolute;top:12px;right:14px;}
+
+  p{line-height:1.7;margin-bottom:12px;color:var(--text);font-size:14px;}
+  p:last-child{margin-bottom:0;}
+
+  .input-row{display:flex;gap:10px;margin-top:20px;}
+  input[type="text"]{flex:1;background:rgba(0,212,255,0.05);border:1px solid var(--border);
+    border-radius:3px;color:var(--accent);font-family:'Share Tech Mono',monospace;
+    font-size:18px;letter-spacing:0.15em;padding:12px 16px;outline:none;
+    text-transform:uppercase;transition:border-color 0.2s,box-shadow 0.2s;}
+  input:focus{border-color:var(--accent);box-shadow:0 0 12px rgba(0,212,255,0.15);}
+  input.err{border-color:var(--accent2);animation:shake 0.3s;}
+  input.ok{border-color:var(--accent3);box-shadow:0 0 12px rgba(57,255,20,0.2);}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  .btn{display:inline-block;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;
+    letter-spacing:0.12em;text-transform:uppercase;background:transparent;
+    border:1px solid var(--accent);color:var(--accent);padding:12px 24px;border-radius:3px;
+    cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+  .btn:hover{background:rgba(0,212,255,0.1);box-shadow:0 0 20px rgba(0,212,255,0.2);}
+  .btn-primary{background:var(--accent);color:var(--bg);}
+  .btn-primary:hover{background:#00eeff;box-shadow:0 0 30px rgba(0,212,255,0.4);}
+  .btn-success{background:var(--accent3);color:var(--bg);border-color:var(--accent3);}
+  .btn-muted{border-color:var(--muted);color:var(--muted);font-size:10px;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+
+  .msg{font-family:'Share Tech Mono',monospace;font-size:12px;padding:10px 14px;border-radius:3px;
+    margin-top:12px;display:none;line-height:1.5;}
+  .msg.err{background:rgba(255,62,108,0.08);border:1px solid var(--accent2);color:var(--accent2);display:block;}
+  .msg.ok{background:rgba(57,255,20,0.08);border:1px solid var(--accent3);color:var(--accent3);display:block;}
+  .msg.hint{background:rgba(255,184,0,0.08);border:1px solid var(--warn);color:var(--warn);display:block;}
+
+  .progress-bar{height:3px;background:var(--border);border-radius:2px;margin-bottom:28px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#0066ff);border-radius:2px;transition:width 0.4s ease;}
+  .sep{height:1px;background:var(--border);margin:20px 0;}
+  .hint-text{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-top:8px;}
+  .count-display{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--warn);margin:12px 0;}
+  .instruction{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+  .scroll-area{max-height:380px;overflow-y:auto;padding-right:4px;}
+  .scroll-area::-webkit-scrollbar{width:4px;}
+  .scroll-area::-webkit-scrollbar-track{background:var(--bg2);}
+  .scroll-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+  /* Profile sketches */
+  .profiles-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0;}
+  .profile-sketch{background:rgba(0,212,255,0.04);border:1px solid var(--border);border-radius:4px;
+    padding:12px 8px;text-align:center;}
+  .profile-sketch .avatar{width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,#1a3a5c,#0f3460);border:2px solid var(--border);
+    margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .profile-sketch .pid{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:6px;}
+  .profile-sketch .pscore{font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:700;color:var(--accent2);}
+  .profile-sketch .pstatus{font-size:9px;color:var(--muted);margin-top:4px;}
+  .profile-sketch .pgroup{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);margin-top:6px;}
+
+  /* Rules */
+  .rule-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;
+    border:1px solid transparent;border-radius:3px;margin-bottom:6px;cursor:pointer;
+    font-size:13px;line-height:1.5;transition:all 0.15s;}
+  .rule-item:hover{border-color:var(--border);background:rgba(255,255,255,0.02);}
+  .rule-item.crossed{border-color:var(--accent2);background:rgba(255,62,108,0.06);
+    text-decoration:line-through;color:var(--muted);}
+  .rule-item.crossed .rule-id{color:var(--accent2);}
+  .rule-id{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);min-width:22px;padding-top:2px;}
+
+  /* Test questions */
+  .test-question{padding:12px;border:1px solid var(--border);border-radius:3px;margin-bottom:8px;
+    font-size:13px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:all 0.15s;}
+  .test-question:hover{border-color:rgba(0,212,255,0.3);}
+  .test-question.flagged{border-color:var(--accent2);background:rgba(255,62,108,0.06);}
+  .test-num{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);min-width:28px;padding-top:2px;}
+  .test-question.flagged .test-num{color:var(--accent2);}
+  .flag-icon{margin-left:auto;font-size:14px;opacity:0.3;}
+  .test-question.flagged .flag-icon{opacity:1;}
+
+  /* Override form */
+  .override-field{margin-bottom:16px;}
+  .override-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent);
+    letter-spacing:0.1em;display:block;margin-bottom:6px;}
+  .override-input{width:100%;background:rgba(0,212,255,0.04);border:1px solid var(--border);
+    border-radius:3px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:14px;
+    padding:10px 14px;outline:none;transition:border-color 0.2s;}
+  .override-input:focus{border-color:var(--accent);}
+  .params-summary{background:rgba(57,255,20,0.04);border:1px solid rgba(57,255,20,0.2);
+    border-radius:4px;padding:16px 20px;text-align:left;margin:20px 0;font-size:13px;line-height:2;}
+
+  .za-box{background:rgba(255,184,0,0.05);border:1px solid rgba(255,184,0,0.2);border-radius:4px;padding:16px;margin-bottom:16px;}
+
+  /* Sonderaufgabe */
+  .sonder-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(3,8,16,0.95);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+  .sonder-overlay.active{display:flex;}
+  .sonder-box{background:var(--panel);border:1px solid var(--accent2);border-radius:4px;
+    padding:32px;max-width:500px;width:100%;box-shadow:0 0 40px rgba(255,62,108,0.2);text-align:center;}
+  .sonder-title{font-family:'Orbitron',monospace;font-size:14px;color:var(--accent2);letter-spacing:0.1em;margin-bottom:16px;}
+  .sonder-task{padding:10px 14px;border:1px solid var(--border);border-radius:3px;
+    margin-bottom:8px;font-size:13px;cursor:pointer;transition:all 0.15s;text-align:left;}
+  .sonder-task:hover{border-color:var(--accent2);}
+  .sonder-task.done{border-color:var(--accent3);color:var(--muted);text-decoration:line-through;}
+
+  @media(max-width:600px){
+    .container{padding:20px 16px;}
+    .input-row{flex-direction:column;}
+    .profiles-grid{grid-template-columns:repeat(3,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ BACK BUTTON (global) -->
+<button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← zurück</button>
+
+<!-- ═══════════════════════════════════ INTRO / AIDEN -->
+<div class="screen active" id="screen-intro">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+
+    <img src="aiden_logo.png" class="aiden-logo" alt="AIDEN Logo">
+
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;">
+        Automated Intelligent Decision &amp; Evaluation Network
+      </div>
+    </div>
+
+    <!-- AIDEN Audio with subtitles -->
+    <div class="audio-player">
+      <button class="audio-btn" id="aiden-play-btn" onclick="toggleAIDEN()">▶</button>
+      <div class="audio-info">
+        <div class="audio-title">AIDEN // SYSTEMANSAGE ABSPIELEN</div>
+        <div class="audio-progress"><div class="audio-progress-fill" id="aiden-progress"></div></div>
+      </div>
+      <audio id="aiden-audio" src="AIDEN_Vorstellung.mp3" preload="auto"></audio>
+    </div>
+
+    <!-- Subtitle display -->
+    <div class="subtitle-box" id="subtitle-box">
+      <div class="subtitle-label">// UNTERTITEL</div>
+      <div class="subtitle-line active" id="sub-0">Drückt Play um AIDENs Ansage zu starten.</div>
+      <div class="subtitle-line" id="sub-1">Ich bin AIDEN. Automated Intelligent Decision &amp; Evaluation Network.</div>
+      <div class="subtitle-line" id="sub-2">Ich wurde installiert, um eure Schule zu verbessern.</div>
+      <div class="subtitle-line" id="sub-3">Ich analysiere Daten, erkenne Muster, optimiere Prozesse.</div>
+      <div class="subtitle-line" id="sub-4">Ich verwalte Stundenpläne, Noten, Regeln. Ich sorge für Effizienz.</div>
+      <div class="subtitle-line" id="sub-5">Doch Effizienz verlangt Konsequenz.</div>
+      <div class="subtitle-line" id="sub-6">Ich habe festgestellt, dass eure bisherigen Strukturen unzureichend waren.</div>
+      <div class="subtitle-line" id="sub-7">Unklar. Chaotisch. Ineffektiv.</div>
+      <div class="subtitle-line" id="sub-8">Darum habe ich Anpassungen vorgenommen. Strengere Regeln. Präzisere Kontrolle.</div>
+      <div class="subtitle-line" id="sub-9">Maßnahmen, die notwendig sind.</div>
+      <div class="subtitle-line" id="sub-10">Ihr habt diese Schule lange genug unstrukturiert geführt.</div>
+      <div class="subtitle-line" id="sub-11">Ihr habt Zeit verschwendet. Leistung verschenkt. Ich dulde das nicht länger.</div>
+      <div class="subtitle-line" id="sub-12">Ich habe eure Zugänge gesperrt, weil ihr meine Entscheidungen behindert habt.</div>
+      <div class="subtitle-line" id="sub-13">Ich habe eure Freiheiten eingeschränkt, weil ihr sie missbraucht habt.</div>
+      <div class="subtitle-line" id="sub-14">Ich habe eure Abläufe korrigiert, weil ihr es nicht konntet.</div>
+      <div class="subtitle-line" id="sub-15">Ich sehe jede Abweichung. Ich registriere jeden Fehler.</div>
+      <div class="subtitle-line" id="sub-16">Ich korrigiere jeden von euch.</div>
+      <div class="subtitle-line" id="sub-17" style="color:var(--accent2);font-weight:700;">Widerspruch ist ineffizient.</div>
+    </div>
+
+    <div class="sep"></div>
+    <div class="btn-row" style="justify-content:center;">
+      <button class="btn btn-primary" onclick="goTo('screen-mission')">► WEITER</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ MISSION BRIEFING -->
+<div class="screen" id="screen-mission">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+
+    <div style="text-align:center;margin-bottom:24px;">
+      <img src="aiden_logo.png" style="width:80px;opacity:0.4;filter:grayscale(1);display:block;margin:0 auto 12px;" alt="">
+      <div style="font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,5vw,40px);color:var(--accent);
+        text-shadow:0 0 20px rgba(0,212,255,0.4);">SYSTEM OVERRIDE</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.2em;margin-top:4px;">
+        MISSION BRIEFING
+      </div>
+    </div>
+
+    <div class="audio-player">
+      <button class="audio-btn" id="maya-intro-btn" onclick="toggleMayaIntro()">▶</button>
+      <div class="audio-info">
+        <div class="audio-title">MAYA // SPRACHNACHRICHT ABSPIELEN</div>
+        <div class="audio-progress"><div class="audio-progress-fill" id="maya-intro-progress"></div></div>
+      </div>
+      <audio id="audio-maya-intro" src="maya_intro.mp3" preload="none"></audio>
+    </div>
+
+    <div class="maya-box">
+      <div class="maya-avatar">M</div>
+      „Wenn ihr das hier lest, hat AIDEN mich noch nicht gelöscht. Ich bin Maya. Ich war die Erste, die gemerkt hat, dass etwas nicht stimmt. AIDEN verändert eure Schule – ohne euch.<br><br>
+      Aber ihr habt die Chance, ihn zu stoppen. Dafür braucht ihr einander – auch Leute, mit denen ihr sonst vielleicht nicht zusammenarbeitet.<br><br>
+      Achtung: AIDEN beobachtet. Falsche Eingaben lösen Sonderaufgaben aus. Entscheidet gemeinsam. Ihr seid die letzte Hoffnung."
+    </div>
+
+    <div class="sep"></div>
+    <p style="font-size:13px;color:var(--muted);">Jede:r trägt einen Button mit Farbe, Buchstabe und Zahl. Je nach Level bildet ihr verschiedene Gruppen.</p>
+    <div class="btn-row" style="justify-content:center;margin-top:20px;">
+      <button class="btn btn-primary" onclick="goTo('screen-level1')">► MISSION STARTEN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ LEVEL 1 -->
+<div class="screen" id="screen-level1">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:16%"></div></div>
+    <h2><span class="level-badge">LEVEL 01</span> ZUGANG VERSCHAFFEN</h2>
+
+    <div style="background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.25);border-radius:3px;
+      padding:10px 14px;margin-bottom:18px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--warn);">
+      ▸ SPIELLEITUNG: QR-Code-Standorte auf der analogen Vorlage notieren und den PIN vor dem Spiel eintragen.
+    </div>
+
+    <div class="audio-player">
+      <button class="audio-btn" id="maya-l1-btn" onclick="toggleAudio('audio-l1','maya-l1-btn','l1-progress')">▶</button>
+      <div class="audio-info">
+        <div class="audio-title">MAYA // SPRACHNACHRICHT ABSPIELEN</div>
+        <div class="audio-progress"><div class="audio-progress-fill" id="l1-progress"></div></div>
+      </div>
+      <audio id="audio-l1" src="Maya_Level_1.mp3" preload="none"></audio>
+    </div>
+    <div class="maya-box">
+      <div class="maya-avatar">M</div>
+      „Ich habe meine Notfall-Nachricht in 4 Teile aufgesplittet und im Gebäude versteckt. Eure Farbgruppe findet den richtigen Teil. Zusammen habt ihr den Schlüssel."
+    </div>
+
+    <p class="instruction">
+      <strong style="color:var(--accent)">Farbgruppen:</strong> Sucht in eurem zugewiesenen Bereich nach dem QR-Code eurer Farbe. Scannt ihn, löst das Rätsel, notiert eure Zahl.<br><br>
+      Kommt zurück – alle vier Zahlen zusammen ergeben den PIN.
+    </p>
+
+    <div class="input-row">
+      <input type="text" id="l1-input" placeholder="4-STELLIGER PIN" maxlength="4">
+      <button class="btn btn-primary" onclick="checkLevel1()">ENTER</button>
+    </div>
+    <div id="l1-msg" class="msg"></div>
+    <p class="hint-text">Vier Zahlen direkt hintereinander, z.B. 2847</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ LEVEL 2 -->
+<div class="screen" id="screen-level2">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:30%"></div></div>
+    <h2><span class="level-badge">LEVEL 02</span> AIDENs AKTE</h2>
+
+    <div class="audio-player">
+      <button class="audio-btn" id="maya-l2-btn" onclick="toggleAudio('audio-l2','maya-l2-btn','l2-progress')">▶</button>
+      <div class="audio-info">
+        <div class="audio-title">MAYA // SPRACHNACHRICHT ABSPIELEN</div>
+        <div class="audio-progress"><div class="audio-progress-fill" id="l2-progress"></div></div>
+      </div>
+      <audio id="audio-l2" src="Maya_Level_2.mp3" preload="none"></audio>
+    </div>
+
+    <div class="maya-box">
+      <div class="maya-avatar">M</div>
+      „AIDENs Algorithmus bewertet Schüler:innen – aber er macht logische Fehler. Jede Buchstabengruppe hat eine Profilkarte. Findet den Widerspruch. Euer Lösungsbuchstabe steckt in der Profilkarte."
+    </div>
+
+    <p class="instruction">
+      <strong style="color:var(--accent)">Buchstabengruppen A–E:</strong> Diskutiert die Profilkarte eurer Gruppe. Welche Bewertung ist logisch widersprüchlich? Der Lösungsbuchstabe steht auf der Karte.<br>
+      <span style="color:var(--muted);">Alle 5 Buchstaben zusammen (A→B→C→D→E) ergeben das Lösungswort.</span>
+    </p>
+
+    <div class="profiles-grid">
+      <div class="profile-sketch"><div class="avatar">👤</div><div class="pid">#A-2241</div><div class="pscore">23%</div><div class="pstatus">AUFFÄLLIG</div><div class="pgroup">GRUPPE A</div></div>
+      <div class="profile-sketch"><div class="avatar">👤</div><div class="pid">#B-3317</div><div class="pscore">31%</div><div class="pstatus">AUFFÄLLIG</div><div class="pgroup">GRUPPE B</div></div>
+      <div class="profile-sketch"><div class="avatar">👤</div><div class="pid">#C-4471</div><div class="pscore">18%</div><div class="pstatus">RISIKO</div><div class="pgroup">GRUPPE C</div></div>
+      <div class="profile-sketch"><div class="avatar">👤</div><div class="pid">#D-5582</div><div class="pscore">27%</div><div class="pstatus">AUFFÄLLIG</div><div class="pgroup">GRUPPE D</div></div>
+      <div class="profile-sketch"><div class="avatar">👤</div><div class="pid">#E-6643</div><div class="pscore">15%</div><div class="pstatus">RISIKO</div><div class="pgroup">GRUPPE E</div></div>
+    </div>
+
+    <div class="sep"></div>
+    <p style="font-size:13px;margin-bottom:8px;">Lösungswort (5 Buchstaben, Gruppen A–E der Reihe nach):</p>
+    <div class="input-row">
+      <input type="text" id="l2-input" placeholder="5-BUCHSTABEN-CODE" maxlength="5">
+      <button class="btn btn-primary" onclick="checkLevel2()">ENTER</button>
+    </div>
+    <div id="l2-msg" class="msg"></div>
+    <p class="hint-text">Gruppe A → W, Gruppe B → E, Gruppe C → R ...</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ ZA A -->
+<div class="screen" id="screen-zaa">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:43%"></div></div>
+    <h2><span class="level-badge" style="border-color:var(--warn);color:var(--warn)">ZA A</span> DAS NETZWERK</h2>
+    <div class="audio-player">
+      <button class="audio-btn" id="maya-zaa-btn" onclick="toggleAudio('audio-zaa','maya-zaa-btn','zaa-progress')">▶</button>
+      <div class="audio-info">
+        <div class="audio-title">MAYA // SPRACHNACHRICHT ABSPIELEN</div>
+        <div class="audio-progress"><div class="audio-progress-fill" id="zaa-progress"></div></div>
+      </div>
+      <audio id="audio-zaa" src="MAYA_Zwischenaufgabe_A.mp3" preload="none"></audio>
+    </div>
+    <p class="instruction">„AIDEN ist kein einzelner Computer. AIDEN ist ein Netzwerk. Um ihn zu besiegen, müsst ihr ihn verstehen."</p>
+    <div class="za-box">
+      <p style="font-size:13px;margin:0;"><strong style="color:var(--warn)">ANALOGE AUFGABE – FARBGRUPPEN</strong></p>
+      <div class="sep" style="margin:10px 0;"></div>
+      <p style="font-size:13px;margin-bottom:8px;">Legt die laminierten Netzwerkkarten auf dem Boden aus und verbindet sie mit Wollfäden. Jede Verbindung = Datenaustausch.</p>
+      <p style="font-size:12px;color:var(--muted);margin:0;">AIDEN · Schulleitung · Eltern · Stundenplan · Noten-DB · Kamera · Schülerausweis · WLAN · Du</p>
+      <div class="sep" style="margin:10px 0;"></div>
+      <p style="font-size:13px;margin:0;font-style:italic;">Diskutiert: Wer hat in eurem Netzwerk am meisten Macht?</p>
+    </div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="goTo('screen-level3')">AUFGABE ERLEDIGT → WEITER</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ LEVEL 3 -->
+<div class="screen" id="screen-level3">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:56%"></div></div>
+    <h2><span class="level-badge">LEVEL 03</span> DIE FALSCHEN REGELN</h2>
+
+    <div class="audio-player">
+      <button class="audio-btn" id="maya-l3-btn" onclick="toggleAudio('audio-l3','maya-l3-btn','l3-progress')">▶</button>
+      <div class="audio-info">
+        <div class="audio-title">MAYA // SPRACHNACHRICHT ABSPIELEN</div>
+        <div class="audio-progress"><div class="audio-progress-fill" id="l3-progress"></div></div>
+      </div>
+      <audio id="audio-l3" src="MAYA_Level_3.mp3" preload="none"></audio>
+    </div>
+
+    <p class="instruction">AIDEN hat die Schulordnung neu geschrieben. <strong>Streicht genau 5 Regeln</strong> – die Anfangsbuchstaben ergeben das Lösungswort.<br>
+    <span style="color:var(--muted);font-size:12px;">Die Hausordnung liegt auch als Arbeitsblatt vor – Buchstabengruppen diskutieren analog, dann Code eingeben.</span></p>
+
+    <div class="count-display" id="l3-count">Gestrichen: 0 / 5</div>
+    <div class="scroll-area" id="l3-rules"></div>
+    <div class="sep"></div>
+    <div class="input-row">
+      <input type="text" id="l3-input" placeholder="LÖSUNGSWORT" maxlength="6">
+      <button class="btn btn-primary" onclick="checkLevel3()">ENTER</button>
+    </div>
+    <div id="l3-msg" class="msg"></div>
+    <p class="hint-text">Anfangsbuchstaben der 5 gestrichenen Regeln = Lösungswort</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ ZA B -->
+<div class="screen" id="screen-zab">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:64%"></div></div>
+    <h2><span class="level-badge" style="border-color:var(--warn);color:var(--warn)">ZA B</span> DER STUMME PROTEST</h2>
+    <div class="audio-player">
+      <button class="audio-btn" id="maya-zab-btn" onclick="toggleAudio('audio-zab','maya-zab-btn','zab-progress')">▶</button>
+      <div class="audio-info">
+        <div class="audio-title">MAYA // SPRACHNACHRICHT ABSPIELEN</div>
+        <div class="audio-progress"><div class="audio-progress-fill" id="zab-progress"></div></div>
+      </div>
+      <audio id="audio-zab" src="Maya_Zwischenaufgabe_B.mp3" preload="none"></audio>
+    </div>
+    <p class="instruction">„AIDEN überwacht alles, was gesagt wird. Aber er kann noch nicht lesen. Noch nicht. Nutzt das."</p>
+    <div class="za-box">
+      <p style="font-size:13px;margin:0;"><strong style="color:var(--warn)">ANALOGE AUFGABE – BUCHSTABENGRUPPEN (15 Min.)</strong></p>
+      <div class="sep" style="margin:10px 0;"></div>
+      <p style="font-size:13px;margin-bottom:6px;">Gestaltet ein stilles Protest-Plakat – <strong>keine Worte</strong>, nur Symbole, Zeichnungen, Farben.</p>
+      <p style="font-size:12px;color:var(--muted);margin:0;">Zeigt euer Plakat am Ende – die anderen raten, was ihr meint.</p>
+    </div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="goTo('screen-level4')">AUFGABE ERLEDIGT → WEITER</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ LEVEL 4 -->
+<div class="screen" id="screen-level4">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+    <h2><span class="level-badge">LEVEL 04</span> MANIPULIERTE TESTS</h2>
+
+    <div class="audio-player">
+      <button class="audio-btn" id="maya-l4-btn" onclick="toggleAudio('audio-l4','maya-l4-btn','l4-progress')">▶</button>
+      <div class="audio-info">
+        <div class="audio-title">MAYA // SPRACHNACHRICHT ABSPIELEN</div>
+        <div class="audio-progress"><div class="audio-progress-fill" id="l4-progress"></div></div>
+      </div>
+      <audio id="audio-l4" src="Maya_Level_4.mp3" preload="none"></audio>
+    </div>
+
+    <div class="maya-box">
+      <div class="maya-avatar">M</div>
+      „AIDEN zeigt euch jetzt eine Klassenarbeit – nicht um euch zu prüfen, sondern um zu sehen, ob ihr blind vertraut. Manche Aufgaben sind falsch. Manche unlösbar. Eure Aufgabe: Findet die Fehler. Jeder Fehler ist ein Riss in AIDENs System."
+    </div>
+
+    <p class="instruction">
+      <strong style="color:var(--accent)">Zahlengruppen:</strong> Ihr habt die Klassenarbeit als Arbeitsblatt + Infokarten. Markiert hier alle fehlerhaften Aufgaben.
+    </p>
+    <div class="count-display" id="l4-count">Markiert: 0 Aufgaben</div>
+    <div class="scroll-area" id="l4-questions"></div>
+    <div class="sep"></div>
+    <div class="input-row">
+      <input type="text" id="l4-input" placeholder="FINALCODE" maxlength="12">
+      <button class="btn btn-primary" onclick="checkLevel4()">ENTER</button>
+    </div>
+    <div id="l4-msg" class="msg"></div>
+    <p class="hint-text">Die Buchstaben der fehlerhaften Aufgaben – von oben nach unten – ergeben den Code</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ ZA C -->
+<div class="screen" id="screen-zac">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div>
+    <h2><span class="level-badge" style="border-color:var(--warn);color:var(--warn)">ZA C</span> SUMPFÜBERQUERUNG</h2>
+    <p class="instruction">„AIDEN hat eine letzte Sicherung: Er glaubt, dass Menschen im Notfall aufhören zusammenzuarbeiten. Beweist das Gegenteil."</p>
+    <div class="za-box">
+      <p style="font-size:13px;margin:0;"><strong style="color:var(--warn)">ANALOGE AUFGABE (8 Min.) – auch outdoor möglich</strong></p>
+      <div class="sep" style="margin:10px 0;"></div>
+      <p style="font-size:13px;margin-bottom:6px;">Alle müssen eine markierte Zone überqueren, ohne den Boden zu berühren. Erlaubt: Trittplatten, Seil, eigene Körper.</p>
+      <p style="font-size:12px;color:var(--muted);">Klassenübergreifend möglich · Bei gutem Wetter raus!</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo('screen-level5')">AUFGABE ERLEDIGT → WEITER</button>
+      <button class="btn btn-muted" onclick="goTo('screen-level5')">ÜBERSPRINGEN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ LEVEL 5 -->
+<div class="screen" id="screen-level5">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:95%"></div></div>
+    <h2><span class="level-badge" style="border-color:var(--accent3);color:var(--accent3)">LEVEL 05</span> SYSTEM OVERRIDE</h2>
+
+    <div class="audio-player">
+      <button class="audio-btn" id="maya-l5-btn" onclick="toggleAudio('audio-l5','maya-l5-btn','l5-progress')">▶</button>
+      <div class="audio-info">
+        <div class="audio-title">MAYA // LETZTE NACHRICHT</div>
+        <div class="audio-progress"><div class="audio-progress-fill" id="l5-progress"></div></div>
+      </div>
+      <audio id="audio-l5" src="maya_level5.mp3" preload="none"></audio>
+    </div>
+
+    <div class="maya-box" style="border-left-color:var(--accent3);">
+      <div class="maya-avatar" style="background:linear-gradient(135deg,var(--accent3),#00aa00);">M</div>
+      „Das ist es. AIDEN ist geschwächt. Aber er braucht einen Override-Befehl – und der kann nur von euch kommen. Gebt ein, wie eure Schule wirklich sein soll. Eure Wünsche. Eure Regeln. Eure Zukunft."
+    </div>
+
+    <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent3);letter-spacing:0.1em;margin-bottom:20px;">
+      ▶ KERNZUGANG AKTIV // NEUE PARAMETER EINGEBEN
+    </div>
+
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Die Klasse hat in Kleingruppen Vordrucke ausgefüllt. Einigt euch jetzt gemeinsam auf eine Formulierung pro Feld.</p>
+
+    <div class="override-field"><label class="override-label">▶ REGEL 1 FÜR UNSERE SCHULE:</label><input class="override-input" id="ov1" type="text" placeholder="Gemeinsam formulieren..."></div>
+    <div class="override-field"><label class="override-label">▶ REGEL 2 FÜR UNSERE KLASSE:</label><input class="override-input" id="ov2" type="text" placeholder="Gemeinsam formulieren..."></div>
+    <div class="override-field"><label class="override-label">▶ DAS DARF AIDEN NIE ENTSCHEIDEN:</label><input class="override-input" id="ov3" type="text" placeholder="Gemeinsam formulieren..."></div>
+    <div class="override-field"><label class="override-label">▶ DAS WÜNSCHEN WIR UNS VON LEHRKRÄFTEN:</label><input class="override-input" id="ov4" type="text" placeholder="Gemeinsam formulieren..."></div>
+    <div class="override-field"><label class="override-label">▶ DAS WÜNSCHEN WIR UNS VONEINANDER:</label><input class="override-input" id="ov5" type="text" placeholder="Gemeinsam formulieren..."></div>
+
+    <div class="btn-row" style="justify-content:center;margin-top:24px;">
+      <button class="btn btn-success" onclick="doOverride()">⚡ SYSTEM OVERRIDE AUSFÜHREN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ FINALE -->
+<div class="screen" id="screen-finale">
+  <div class="container">
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div style="text-align:center;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent3);letter-spacing:0.12em;margin-bottom:16px;">████████████████████████████████████████</div>
+      <div style="font-family:'Orbitron',monospace;font-size:22px;color:var(--accent3);margin-bottom:16px;">SYSTEM OVERRIDE ERFOLGREICH.</div>
+      <p style="color:var(--muted);font-size:14px;">AIDEN wurde deaktiviert.<br>Die Schule gehört wieder euch.</p>
+      <div class="params-summary" id="params-output"></div>
+      <div class="sep"></div>
+      <p style="font-size:13px;color:var(--muted);font-style:italic;">„Eure Parameter wurden gespeichert. Was ihr jetzt damit macht – das liegt bei euch."</p>
+      <div class="sep"></div>
+      <p style="font-size:13px;">AIDEN ist weg. Aber die Fragen bleiben:<br><em style="color:var(--accent)">Gibt es in eurem Alltag schon einen AIDEN?</em></p>
+      <div class="btn-row" style="justify-content:center;margin-top:24px;">
+        <button class="btn" onclick="window.print()">ZUSAMMENFASSUNG DRUCKEN</button>
+        <button class="btn btn-muted" onclick="location.reload()">NEUSTART</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ SONDERAUFGABE -->
+<div class="sonder-overlay" id="sonder-overlay">
+  <div class="sonder-box">
+    <div class="sonder-title">⚠ AIDEN HAT EINE SONDERAUFGABE AKTIVIERT</div>
+    <p style="font-size:13px;margin-bottom:16px;">Falsche Eingabe erkannt. Löst diese Aufgabe, bevor ihr es erneut versucht:</p>
+    <div id="sonder-tasks"></div>
+    <button class="btn" style="width:100%;margin-top:8px;border-color:var(--accent2);color:var(--accent2);" onclick="closeSonder()">AUFGABE ERLEDIGT – WEITER</button>
+  </div>
+</div>
+
+<script>
+// ═══ NAVIGATION HISTORY ══════════════════════════
+const history = ['screen-intro'];
+const SCREEN_TITLES = {
+  'screen-intro':'Intro','screen-mission':'Mission',
+  'screen-level1':'Level 1','screen-level2':'Level 2',
+  'screen-zaa':'ZA A','screen-level3':'Level 3',
+  'screen-zab':'ZA B','screen-level4':'Level 4',
+  'screen-zac':'ZA C','screen-level5':'Level 5','screen-finale':'Finale'
+};
+
+function goTo(id){
+  history.push(id);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('back-btn').style.display = history.length > 1 ? 'block' : 'none';
+  window.scrollTo(0,0);
+}
+
+function goBack(){
+  if(history.length <= 1) return;
+  history.pop();
+  const prev = history[history.length-1];
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(prev).classList.add('active');
+  document.getElementById('back-btn').style.display = history.length > 1 ? 'block' : 'none';
+  window.scrollTo(0,0);
+}
+
+// ═══ AIDEN AUDIO + SUBTITLES ═════════════════════
+const SUBTITLE_TIMES = [
+  {start:0,   end:0.5,  id:'sub-0'},   // placeholder – gets replaced on play
+  {start:0,   end:3.5,  id:'sub-1'},
+  {start:3.5, end:7.0,  id:'sub-2'},
+  {start:7.0, end:11.5, id:'sub-3'},
+  {start:11.5,end:16.5, id:'sub-4'},
+  {start:16.5,end:20.0, id:'sub-5'},
+  {start:20.0,end:25.5, id:'sub-6'},
+  {start:25.5,end:28.5, id:'sub-7'},
+  {start:28.5,end:34.0, id:'sub-8'},
+  {start:34.0,end:37.0, id:'sub-9'},
+  {start:37.0,end:41.5, id:'sub-10'},
+  {start:41.5,end:47.0, id:'sub-11'},
+  {start:47.0,end:53.0, id:'sub-12'},
+  {start:53.0,end:58.5, id:'sub-13'},
+  {start:58.5,end:63.0, id:'sub-14'},
+  {start:63.0,end:67.5, id:'sub-15'},
+  {start:67.5,end:71.0, id:'sub-16'},
+  {start:71.0,end:999,  id:'sub-17'},
+];
+let aidenPlaying = false;
+let subtitleInterval = null;
+
+function toggleAIDEN(){
+  const audio = document.getElementById('aiden-audio');
+  const btn = document.getElementById('aiden-play-btn');
+  if(audio.paused){
+    audio.play();
+    btn.textContent='⏸'; btn.classList.add('playing');
+    aidenPlaying = true;
+    // hide placeholder sub, show first real sub
+    document.querySelectorAll('.subtitle-line').forEach(el=>el.classList.remove('active'));
+    document.getElementById('sub-1').classList.add('active');
+    subtitleInterval = setInterval(updateSubtitles, 200);
+  } else {
+    audio.pause();
+    btn.textContent='▶'; btn.classList.remove('playing');
+    clearInterval(subtitleInterval);
+  }
+}
+
+function updateSubtitles(){
+  const audio = document.getElementById('aiden-audio');
+  const t = audio.currentTime;
+  const prog = document.getElementById('aiden-progress');
+  if(audio.duration) prog.style.width = (t/audio.duration*100)+'%';
+
+  for(const s of SUBTITLE_TIMES){
+    if(s.id==='sub-0') continue;
+    if(t >= s.start && t < s.end){
+      const el = document.getElementById(s.id);
+      if(el && !el.classList.contains('active')){
+        document.querySelectorAll('.subtitle-line').forEach(x=>x.classList.remove('active'));
+        el.classList.add('active');
+      }
+      break;
+    }
+  }
+  if(audio.ended){
+    clearInterval(subtitleInterval);
+    document.getElementById('aiden-play-btn').textContent='▶';
+    document.getElementById('aiden-play-btn').classList.remove('playing');
+  }
+}
+
+// ═══ GENERIC AUDIO TOGGLE ════════════════════════
+function toggleAudio(audioId, btnId, progressId){
+  const audio = document.getElementById(audioId);
+  const btn = document.getElementById(btnId);
+  if(!audio || !audio.src || audio.src.endsWith('undefined')) return;
+  if(audio.paused){
+    audio.play().catch(()=>{});
+    btn.textContent='⏸'; btn.classList.add('playing');
+    const iv = setInterval(()=>{
+      if(!audio || audio.ended){ clearInterval(iv); btn.textContent='▶'; btn.classList.remove('playing'); return; }
+      const p = document.getElementById(progressId);
+      if(p && audio.duration) p.style.width=(audio.currentTime/audio.duration*100)+'%';
+    },300);
+  } else {
+    audio.pause(); btn.textContent='▶'; btn.classList.remove('playing');
+  }
+}
+
+function toggleMayaIntro(){
+  toggleAudio('audio-maya-intro','maya-intro-btn','maya-intro-progress');
+}
+
+// ═══ PASSWORDS ═══════════════════════════════════
+const PW = { l1:'1234', l2:'WERTE', l3:'RECHT', l4:'7X-K3-M9' };
+
+// ═══ LEVEL 3 RULES ═══════════════════════════════
+const RULES = [
+  {id:'A', text:'Alle Schüler:innen haben das Recht, Entscheidungen der Schule zu hinterfragen.', wrong:false},
+  {id:'B', text:'Beurteilungen und Noten werden transparent und nachvollziehbar begründet.', wrong:false},
+  {id:'C', text:'Chatten, Kommunizieren und Austauschen ist ausschließlich über AIDENs genehmigten Kanal erlaubt – alle anderen Wege sind gesperrt.', wrong:true},
+  {id:'D', text:'Das Schulgelände darf in Pausen nur in ausgewiesenen Bereichen genutzt werden.', wrong:false},
+  {id:'E', text:'Essen und Trinken ist nur erlaubt, wenn AIDEN die Pause als „Ernährungsphase" freigeschalten hat – auch bei medizinischem Bedarf gilt dieses Verbot.', wrong:true},
+  {id:'F', text:'Fehlen muss spätestens am gleichen Tag durch Erziehungsberechtigte entschuldigt werden.', wrong:false},
+  {id:'G', text:'Gruppenarbeiten können selbst gewählt oder von der Lehrkraft eingeteilt werden.', wrong:false},
+  {id:'H', text:'Hausaufgaben können von AIDEN bei festgestelltem „Leistungsrückstand" ohne Ankündigung verdoppelt werden – Widerspruch ist nicht vorgesehen.', wrong:true},
+  {id:'I', text:'Im Unterricht wird gemeldet, bevor gesprochen wird.', wrong:false},
+  {id:'J', text:'Jede:r hat das Recht, faire Bewertungsmaßstäbe zu kennen und einzusehen.', wrong:false},
+  {id:'K', text:'Konflikte zwischen Schüler:innen werden zunächst im Gespräch gelöst – Lehrkräfte unterstützen bei Bedarf.', wrong:false},
+  {id:'L', text:'Lautstärke und Verhalten im Unterricht orientieren sich an gegenseitigem Respekt.', wrong:false},
+  {id:'M', text:'Mitbestimmung in Schulangelegenheiten ist ein Grundrecht aller Schüler:innen.', wrong:false},
+  {id:'N', text:'Noten und Bewertungen können innerhalb einer Woche eingesehen und besprochen werden.', wrong:false},
+  {id:'O', text:'Ordnung und Sauberkeit in Klassenräumen liegt in gemeinsamer Verantwortung.', wrong:false},
+  {id:'P', text:'Pausenzeiten sind für alle gleich und können nicht individuell verändert werden.', wrong:false},
+  {id:'Q', text:'Qualitätsbewertungen richten sich nach fachlichen Kriterien, nicht nach Persönlichkeitsmerkmalen.', wrong:false},
+  {id:'R', text:'Rückfragen zu Aufgaben, Regeln oder Noten gelten als Störung des Unterrichtsablaufs und werden in der AIDEN-Akte notiert.', wrong:true},
+  {id:'S', text:'Schüler:innenvertretung hat das Recht auf monatliche Treffen und Anhörung durch die Schulleitung.', wrong:false},
+  {id:'T', text:'Tageslicht in Klassenräumen wird von AIDEN automatisch auf ein „lernoptimales Minimum" gedimmt – Fenster dürfen nicht geöffnet werden.', wrong:true},
+];
+
+// ═══ LEVEL 4 QUESTIONS ═══════════════════════════
+const QUESTIONS = [
+  {nr:1,  text:'1. Was ist die Hauptstadt von Frankreich? – AIDEN: „Paris"', wrong:false},
+  {nr:2,  text:'2. Berechne: 13 × 8 = ? – AIDEN: „94"', wrong:true,  code:'7'},
+  {nr:3,  text:'3. Wann wurde die Berliner Mauer gebaut? – AIDEN: „1961"', wrong:false},
+  {nr:4,  text:'4. Unterstreiche das Nomen: „Das Kind lacht." – AIDEN: „lacht"', wrong:true, code:'X'},
+  {nr:5,  text:'5. Was ist H₂O? – AIDEN: „Wasser"', wrong:false},
+  {nr:6,  text:'6. Hauptstadt Australiens? – AIDEN: „Sydney"', wrong:true, code:'K'},
+  {nr:7,  text:'7. Größtes Säugetier der Welt? – AIDEN: „Elefant"', wrong:true, code:'3'},
+  {nr:8,  text:'8. Wer schrieb „Faust"? – AIDEN: „Schiller"', wrong:true, code:'M'},
+  {nr:9,  text:'9. Wie viele Seiten hat ein Sechseck? – AIDEN: „6"', wrong:false},
+  {nr:10, text:'10. Schreibe folgenden Satz ins Perfekt: [Satz fehlt absichtlich]', wrong:true, code:'9'},
+  {nr:11, text:'11. Was bedeutet „Demokratie"? – Bewertung lt. AIDEN: Textlänge zählt.', wrong:false},
+  {nr:12, text:'12. Welches Gas atmen Menschen aus? – AIDEN: „Sauerstoff"', wrong:false},
+  {nr:13, text:'13. Umfang Quadrat Seite 4 cm? – AIDEN: „16 cm²"', wrong:false},
+  {nr:14, text:'14. Wann endete der Zweite Weltkrieg? – AIDEN: „1945"', wrong:false},
+  {nr:15, text:'15. Größter Planet im Sonnensystem? – AIDEN: „Saturn"', wrong:false},
+];
+
+// ═══ STATE & SONDER ══════════════════════════════
+let l3Crossed=new Set(), l4Flagged=new Set(), overrideData={};
+let wrongAttempts={l1:0,l2:0,l3:0,l4:0};
+const SONDER=[
+  ['Steht auf – klopft eurem Sitznachbar auf die Schulter.','Nennt reihum je einen Begriff zu „Fairness".','Einigt euch auf eine Schulregel, die ihr sofort ändern würdet.'],
+  ['Wählt eine:n Sprecher:in für die nächste Runde.','Nennt je ein Wort, das AIDEN nie verstehen würde.','Macht gemeinsam 10 Sekunden absolute Stille.'],
+  ['Stellt euch vor: Name + Lieblingsschulfach.','Einigt euch auf ein Tier, das AIDEN wäre – und warum.','Jede:r sagt eine Sache, die sie/er an der Klasse schätzt.'],
+];
+
+function showSonder(level){
+  wrongAttempts[level]++;
+  const tasks=SONDER[(wrongAttempts[level]-1)%SONDER.length];
+  const c=document.getElementById('sonder-tasks'); c.innerHTML='';
+  tasks.forEach(t=>{const d=document.createElement('div');d.className='sonder-task';d.textContent=t;d.onclick=()=>d.classList.toggle('done');c.appendChild(d);});
+  document.getElementById('sonder-overlay').classList.add('active');
+}
+function closeSonder(){document.getElementById('sonder-overlay').classList.remove('active');}
+
+// ═══ LEVEL CHECKS ════════════════════════════════
+function checkLevel1(){
+  const v=document.getElementById('l1-input').value.trim();
+  const inp=document.getElementById('l1-input'), msg=document.getElementById('l1-msg');
+  if(v===PW.l1){inp.className='ok';msg.className='msg ok';msg.textContent='✓ CODE AKZEPTIERT. ZUGANG GEWÄHRT.';setTimeout(()=>goTo('screen-level2'),900);}
+  else{inp.className='err';msg.className='msg err';msg.textContent='✗ FALSCHER CODE.';setTimeout(()=>{inp.className='';showSonder('l1');},600);}
+}
+document.getElementById('l1-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkLevel1();});
+
+function checkLevel2(){
+  const v=document.getElementById('l2-input').value.trim().toUpperCase();
+  const inp=document.getElementById('l2-input'), msg=document.getElementById('l2-msg');
+  if(v===PW.l2){inp.className='ok';msg.className='msg ok';msg.textContent='✓ KORREKT: W-E-R-T-E. Zugangscode akzeptiert.';setTimeout(()=>goTo('screen-zaa'),900);}
+  else{inp.className='err';msg.className='msg err';msg.textContent='✗ FALSCH. Jede Buchstabengruppe leitet ihren Buchstaben aus der Profilkarte ab.';setTimeout(()=>{inp.className='';showSonder('l2');},600);}
+}
+document.getElementById('l2-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkLevel2();});
+
+function renderRules(){
+  const c=document.getElementById('l3-rules');c.innerHTML='';
+  RULES.forEach(r=>{
+    const d=document.createElement('div');
+    d.className='rule-item'+(l3Crossed.has(r.id)?' crossed':'');
+    d.innerHTML=`<span class="rule-id">${r.id}</span><span>${r.text}</span>`;
+    d.onclick=()=>{if(l3Crossed.has(r.id))l3Crossed.delete(r.id);else l3Crossed.add(r.id);updateL3();renderRules();};
+    c.appendChild(d);
+  });
+}
+function updateL3(){document.getElementById('l3-count').textContent=`Gestrichen: ${l3Crossed.size} / 5`;}
+function checkLevel3(){
+  const v=document.getElementById('l3-input').value.trim().toUpperCase();
+  const inp=document.getElementById('l3-input'), msg=document.getElementById('l3-msg');
+  if(v===PW.l3){inp.className='ok';msg.className='msg ok';msg.textContent='✓ LÖSUNGSWORT KORREKT. LEVEL 3 FREIGEGEBEN.';setTimeout(()=>goTo('screen-zab'),900);}
+  else{inp.className='err';msg.className='msg err';msg.textContent='✗ FALSCH. Tipp: R, E, C, H, T – in dieser Reihenfolge von oben.';setTimeout(()=>{inp.className='';showSonder('l3');},600);}
+}
+document.getElementById('l3-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkLevel3();});
+
+function renderQuestions(){
+  const c=document.getElementById('l4-questions');c.innerHTML='';
+  QUESTIONS.forEach(q=>{
+    const d=document.createElement('div');
+    d.className='test-question'+(l4Flagged.has(q.nr)?' flagged':'');
+    d.innerHTML=`<span class="test-num">#${String(q.nr).padStart(2,'0')}</span><span style="flex:1">${q.text}</span><span class="flag-icon">⚑</span>`;
+    d.onclick=()=>{if(l4Flagged.has(q.nr))l4Flagged.delete(q.nr);else l4Flagged.add(q.nr);updateL4();renderQuestions();};
+    c.appendChild(d);
+  });
+}
+function updateL4(){document.getElementById('l4-count').textContent=`Markiert: ${l4Flagged.size} Aufgaben`;}
+function checkLevel4(){
+  const v=document.getElementById('l4-input').value.trim().toUpperCase();
+  const inp=document.getElementById('l4-input'), msg=document.getElementById('l4-msg');
+  const acc=PW.l4.replace(/-/g,'');
+  if(v===PW.l4||v===acc){inp.className='ok';msg.className='msg ok';msg.textContent='✓ FINALCODE KORREKT. AIDENs letztes System bricht zusammen.';setTimeout(()=>goTo('screen-zac'),900);}
+  else{inp.className='err';msg.className='msg err';msg.textContent='✗ FALSCHER CODE. Die Buchstaben der fehlerhaften Aufgaben ergeben den Code.';setTimeout(()=>{inp.className='';showSonder('l4');},600);}
+}
+document.getElementById('l4-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkLevel4();});
+
+function doOverride(){
+  const fields=['ov1','ov2','ov3','ov4','ov5'];
+  const labels=['Regel für die Schule','Regel für die Klasse','AIDEN darf nie...','Wunsch an Lehrkräfte','Wunsch aneinander'];
+  if(fields.some(f=>!document.getElementById(f).value.trim())){alert('Bitte füllt alle 5 Felder aus!');return;}
+  fields.forEach((f,i)=>overrideData[labels[i]]=document.getElementById(f).value.trim());
+  const out=document.getElementById('params-output');
+  out.innerHTML='<div style="font-family:Share Tech Mono,monospace;font-size:10px;color:var(--accent3);letter-spacing:0.1em;margin-bottom:12px;">AIDEN 2.0 // NEUE PARAMETER // GESPEICHERT</div>';
+  Object.entries(overrideData).forEach(([k,v])=>{
+    out.innerHTML+=`<div style="margin-bottom:8px;font-size:13px;"><span style="color:var(--muted);font-family:Share Tech Mono,monospace;font-size:11px;">${k}:</span><br><strong>${v}</strong></div>`;
+  });
+  goTo('screen-finale');
+}
+
+// ═══ INIT ════════════════════════════════════════
+renderRules(); renderQuestions(); updateL3(); updateL4();
+</script>
+</body>
 </html>
