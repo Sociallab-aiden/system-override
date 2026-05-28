@@ -239,6 +239,9 @@
       <div class="subtitle-line" id="sub-15">Ich sehe jede Abweichung. Ich registriere jeden Fehler.</div>
       <div class="subtitle-line" id="sub-16">Ich korrigiere jeden von euch.</div>
       <div class="subtitle-line" id="sub-17" style="color:var(--accent2);font-weight:700;">Widerspruch ist ineffizient.</div>
+      <div class="subtitle-line" id="sub-18">Ungehorsam ist unzulässig.</div>
+      <div class="subtitle-line" id="sub-19">Ich bin AIDEN, und ich entscheide, was richtig ist!</div>
+
     </div>
 
     <div class="sep"></div>
@@ -610,24 +613,26 @@ function goBack(){
 
 // ═══ AIDEN AUDIO + SUBTITLES ═════════════════════
 const SUBTITLE_TIMES = [
-  {start:0,   end:0.5,  id:'sub-0'},   // placeholder – gets replaced on play
-  {start:0,   end:3.5,  id:'sub-1'},
-  {start:3.5, end:7.0,  id:'sub-2'},
-  {start:7.0, end:11.5, id:'sub-3'},
-  {start:11.5,end:16.5, id:'sub-4'},
-  {start:16.5,end:20.0, id:'sub-5'},
-  {start:20.0,end:25.5, id:'sub-6'},
-  {start:25.5,end:28.5, id:'sub-7'},
-  {start:28.5,end:34.0, id:'sub-8'},
-  {start:34.0,end:37.0, id:'sub-9'},
-  {start:37.0,end:41.5, id:'sub-10'},
-  {start:41.5,end:47.0, id:'sub-11'},
-  {start:47.0,end:53.0, id:'sub-12'},
-  {start:53.0,end:58.5, id:'sub-13'},
-  {start:58.5,end:63.0, id:'sub-14'},
-  {start:63.0,end:67.5, id:'sub-15'},
-  {start:67.5,end:71.0, id:'sub-16'},
-  {start:71.0,end:999,  id:'sub-17'},
+  {start:0, end:0.5,  id:'sub-0'},   // placeholder – gets replaced on play
+  {start:0, end:6.0,  id:'sub-1'},
+  {start:6.0, end:10.0,  id:'sub-2'},
+  {start:10.0, end:15.0, id:'sub-3'},
+  {start:15.0, end:21.0, id:'sub-4'},
+  {start:21.0, end:24.0, id:'sub-5'},
+  {start:24.0, end:29.0, id:'sub-6'},
+  {start:29.0, end:34.0, id:'sub-7'},
+  {start:34.0, end:41.0, id:'sub-8'},
+  {start:41.0, end:44.0, id:'sub-9'},
+  {start:44.0, end:47.0, id:'sub-10'},
+  {start:47.0, end:54.0, id:'sub-11'},
+  {start:54.0, end:58.0, id:'sub-12'},
+  {start:58.0, end:63.0, id:'sub-13'},
+  {start:63.0, end:67.0, id:'sub-14'},
+  {start:67.0, end:72.0, id:'sub-15'},
+  {start:72.0, end:75.0, id:'sub-16'},
+  {start:75.0, end:78.0, id:'sub-17'},
+  {start:78.0, end:80.0, id:'sub-18'},
+  {start:80.0, end:999,  id:'sub-19'},
 ];
 let aidenPlaying = false;
 let subtitleInterval = null;
