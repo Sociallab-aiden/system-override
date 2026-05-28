@@ -577,15 +577,8 @@
 <div class="screen" id="screen-level5">
   <div class="container">
     <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
-
-    <div class="progress-bar">
-      <div class="progress-fill" style="width:95%"></div>
-    </div>
-
-    <h2>
-      <span class="level-badge" style="border-color:var(--accent3);color:var(--accent3)">LEVEL 05</span>
-      SYSTEM OVERRIDE
-    </h2>
+    <div class="progress-bar"><div class="progress-fill" style="width:95%"></div></div>
+    <h2><span class="level-badge" style="border-color:var(--accent3);color:var(--accent3)">LEVEL 05</span> SYSTEM OVERRIDE</h2>
 
     <div class="audio-player">
       <button class="audio-btn" id="maya-l5-btn" onclick="toggleAudio('audio-l5','maya-l5-btn','l5-progress')">▶</button>
@@ -598,41 +591,20 @@
 
     <div class="maya-box" style="border-left-color:var(--accent3);">
       <div class="maya-avatar" style="background:linear-gradient(135deg,var(--accent3),#00aa00);">M</div>
-      „Das ist es. AIDEN ist geschwächt. Aber er braucht einen Override-Befehl – und der kann nur von euch kommen. Gebt ein, wie eure Schule wirklich sein soll. Eure Wünsche. Eure Regeln. Eure Zukunft.“
+      „Das ist es. AIDEN ist geschwächt. Aber er braucht einen Override-Befehl – und der kann nur von euch kommen. Gebt ein, wie eure Schule wirklich sein soll. Eure Wünsche. Eure Regeln. Eure Zukunft."
     </div>
 
     <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent3);letter-spacing:0.1em;margin-bottom:20px;">
       ▶ KERNZUGANG AKTIV // NEUE PARAMETER EINGEBEN
     </div>
 
-    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">
-      Die Klasse hat in Kleingruppen Vordrucke ausgefüllt. Einigt euch jetzt gemeinsam auf eine Formulierung pro Feld.
-    </p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Die Klasse hat in Kleingruppen Vordrucke ausgefüllt. Einigt euch jetzt gemeinsam auf eine Formulierung pro Feld.</p>
 
-    <div class="override-field">
-      <label class="override-label">▶ REGEL 1 FÜR UNSERE SCHULE:</label>
-      <input class="override-input" id="ov1" type="text" placeholder="Gemeinsam formulieren...">
-    </div>
-
-    <div class="override-field">
-      <label class="override-label">▶ REGEL 2 FÜR UNSERE KLASSE:</label>
-      <input class="override-input" id="ov2" type="text" placeholder="Gemeinsam formulieren...">
-    </div>
-
-    <div class="override-field">
-      <label class="override-label">▶ DAS DARF AIDEN NIE ENTSCHEIDEN:</label>
-      <input class="override-input" id="ov3" type="text" placeholder="Gemeinsam formulieren...">
-    </div>
-
-    <div class="override-field">
-      <label class="override-label">▶ DAS WÜNSCHEN WIR UNS VON LEHRKRÄFTEN:</label>
-      <input class="override-input" id="ov4" type="text" placeholder="Gemeinsam formulieren...">
-    </div>
-
-    <div class="override-field">
-      <label class="override-label">▶ DAS WÜNSCHEN WIR UNS VONEINANDER:</label>
-      <input class="override-input" id="ov5" type="text" placeholder="Gemeinsam formulieren...">
-    </div>
+    <div class="override-field"><label class="override-label">▶ REGEL 1 FÜR UNSERE SCHULE:</label><input class="override-input" id="ov1" type="text" placeholder="Gemeinsam formulieren..."></div>
+    <div class="override-field"><label class="override-label">▶ REGEL 2 FÜR UNSERE KLASSE:</label><input class="override-input" id="ov2" type="text" placeholder="Gemeinsam formulieren..."></div>
+    <div class="override-field"><label class="override-label">▶ DAS DARF AIDEN NIE ENTSCHEIDEN:</label><input class="override-input" id="ov3" type="text" placeholder="Gemeinsam formulieren..."></div>
+    <div class="override-field"><label class="override-label">▶ DAS WÜNSCHEN WIR UNS VON LEHRKRÄFTEN:</label><input class="override-input" id="ov4" type="text" placeholder="Gemeinsam formulieren..."></div>
+    <div class="override-field"><label class="override-label">▶ DAS WÜNSCHEN WIR UNS VONEINANDER:</label><input class="override-input" id="ov5" type="text" placeholder="Gemeinsam formulieren..."></div>
 
     <div class="btn-row" style="justify-content:center;margin-top:24px;">
       <button class="btn btn-success" onclick="doOverride()">⚡ SYSTEM OVERRIDE AUSFÜHREN</button>
@@ -702,26 +674,24 @@ function goBack(){
 
 // ═══ AIDEN AUDIO + SUBTITLES ═════════════════════
 const SUBTITLE_TIMES = [
-  {start:0, end:0.5,  id:'sub-0'},   // placeholder – gets replaced on play
-  {start:0, end:6.0,  id:'sub-1'},
-  {start:6.0, end:10.0,  id:'sub-2'},
-  {start:10.0, end:15.0, id:'sub-3'},
-  {start:15.0, end:21.0, id:'sub-4'},
-  {start:21.0, end:24.0, id:'sub-5'},
-  {start:24.0, end:29.0, id:'sub-6'},
-  {start:29.0, end:34.0, id:'sub-7'},
-  {start:34.0, end:41.0, id:'sub-8'},
-  {start:41.0, end:44.0, id:'sub-9'},
-  {start:44.0, end:47.0, id:'sub-10'},
-  {start:47.0, end:54.0, id:'sub-11'},
-  {start:54.0, end:58.0, id:'sub-12'},
-  {start:58.0, end:63.0, id:'sub-13'},
-  {start:63.0, end:67.0, id:'sub-14'},
-  {start:67.0, end:72.0, id:'sub-15'},
-  {start:72.0, end:75.0, id:'sub-16'},
-  {start:75.0, end:78.0, id:'sub-17'},
-  {start:78.0, end:80.0, id:'sub-18'},
-  {start:80.0, end:999,  id:'sub-19'},
+  {start:0,   end:0.5,  id:'sub-0'},   // placeholder – gets replaced on play
+  {start:0,   end:3.5,  id:'sub-1'},
+  {start:3.5, end:7.0,  id:'sub-2'},
+  {start:7.0, end:11.5, id:'sub-3'},
+  {start:11.5,end:16.5, id:'sub-4'},
+  {start:16.5,end:20.0, id:'sub-5'},
+  {start:20.0,end:25.5, id:'sub-6'},
+  {start:25.5,end:28.5, id:'sub-7'},
+  {start:28.5,end:34.0, id:'sub-8'},
+  {start:34.0,end:37.0, id:'sub-9'},
+  {start:37.0,end:41.5, id:'sub-10'},
+  {start:41.5,end:47.0, id:'sub-11'},
+  {start:47.0,end:53.0, id:'sub-12'},
+  {start:53.0,end:58.5, id:'sub-13'},
+  {start:58.5,end:63.0, id:'sub-14'},
+  {start:63.0,end:67.5, id:'sub-15'},
+  {start:67.5,end:71.0, id:'sub-16'},
+  {start:71.0,end:999,  id:'sub-17'},
 ];
 let aidenPlaying = false;
 let subtitleInterval = null;
