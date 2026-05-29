@@ -30,6 +30,11 @@
     background:transparent;border:1px solid var(--muted);border-radius:3px;
     padding:7px 12px;cursor:pointer;transition:all 0.2s;opacity:0.5;}
   .back-btn:hover{opacity:1;color:var(--accent);border-color:var(--accent);}
+  .skip-btn{position:fixed;bottom:20px;right:20px;z-index:500;
+    font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted);
+    background:transparent;border:1px solid var(--muted);border-radius:3px;
+    padding:7px 12px;cursor:pointer;transition:all 0.2s;opacity:0.5;}
+  .skip-btn:hover{opacity:1;color:var(--accent3);border-color:var(--accent3);}
 
   .container{width:100%;max-width:750px;background:var(--panel);border:1px solid var(--border);
     border-radius:4px;padding:32px;position:relative;
@@ -194,6 +199,7 @@
 
 <!-- ═══════════════ BACK BUTTON (global) -->
 <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← zurück</button>
+<button class="skip-btn" id="skip-btn" onclick="goNext()" style="display:none;">weiter →</button>
 
 <!-- ═══════════════════════════════════ INTRO / AIDEN -->
 <div class="screen active" id="screen-intro">
@@ -652,6 +658,8 @@ function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.getElementById('back-btn').style.display = history.length > 1 ? 'block' : 'none';
+  const idx = SCREEN_ORDER ? SCREEN_ORDER.indexOf(id) : -1;
+  document.getElementById('skip-btn').style.display = (idx >= 0 && idx < SCREEN_ORDER.length-1) ? 'block' : 'none';
   window.scrollTo(0,0);
 }
 
@@ -663,6 +671,16 @@ function goBack(){
   document.getElementById(prev).classList.add('active');
   document.getElementById('back-btn').style.display = history.length > 1 ? 'block' : 'none';
   window.scrollTo(0,0);
+}
+
+const SCREEN_ORDER = ['screen-intro','screen-mission','screen-level1','screen-level2',
+  'screen-zaa','screen-level3','screen-zab','screen-level4','screen-zac','screen-level5','screen-finale'];
+
+function goNext(){
+  const current = history[history.length-1];
+  const idx = SCREEN_ORDER.indexOf(current);
+  if(idx === -1 || idx >= SCREEN_ORDER.length-1) return;
+  goTo(SCREEN_ORDER[idx+1]);
 }
 
 // ═══ AIDEN AUDIO + SUBTITLES ═════════════════════
@@ -893,3 +911,4 @@ renderRules(); renderQuestions(); updateL3(); updateL4();
 </script>
 </body>
 </html>
+
