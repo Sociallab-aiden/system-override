@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SYSTEM OVERRIDE – Gruppe ROT</title>
+<style>
+
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#030810;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;padding:20px;gap:14px;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:9999;}
+  body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+  .header{position:relative;z-index:1;text-align:center;}
+  .badge{display:inline-block;color:white;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.15em;padding:4px 16px;border-radius:2px;margin-bottom:8px;}
+  .title{color:#00d4ff;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;}
+  .flip-wrap{position:relative;z-index:1;width:min(680px,95vw);aspect-ratio:3/2;perspective:1200px;cursor:pointer;}
+  .card{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 0.75s cubic-bezier(0.4,0,0.2,1);border-radius:12px;}
+  .card.flipped{transform:rotateY(180deg);}
+  .face{position:absolute;top:0;left:0;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;overflow:hidden;box-shadow:0 8px 48px rgba(0,0,0,0.7);}
+  .face img{width:100%;height:100%;object-fit:cover;display:block;}
+  .back{transform:rotateY(180deg);}
+  .flip-bar{position:relative;z-index:1;width:min(680px,95vw);display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;color:#2a4060;letter-spacing:0.1em;}
+  .flip-bar::before,.flip-bar::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,#0f3460);}
+  .flip-bar::after{background:linear-gradient(90deg,#0f3460,transparent);}
+  .task-box{position:relative;z-index:1;width:min(680px,95vw);background:#0a1628;border-radius:6px;overflow:hidden;}
+  .task-box::before{content:'';display:block;height:2px;}
+  .task-inner{padding:18px 20px;}
+  .task-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:10px;display:block;}
+  .main-task{font-size:14px;color:#d0e8ff;line-height:1.7;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:14px;}
+  .hints{display:flex;flex-direction:column;gap:8px;}
+  .hint-row{border:1px solid rgba(255,255,255,0.07);border-radius:5px;overflow:hidden;transition:border-color 0.2s;}
+  .hint-trigger{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;background:rgba(255,255,255,0.02);transition:background 0.2s;user-select:none;}
+  .hint-trigger:hover{background:rgba(255,255,255,0.04);}
+  .hint-num{width:24px;height:24px;border-radius:50%;color:white;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .hint-meta{flex:1;}
+  .hint-meta-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:3px;}
+  .hint-meta-q{font-size:13px;color:#c8e0f4;}
+  .hint-lock{font-size:16px;opacity:0.5;}
+  .hint-content{display:none;padding:12px 16px 14px 52px;background:rgba(57,255,20,0.03);border-top:1px solid rgba(57,255,20,0.1);font-size:13px;color:#c8e0f4;line-height:1.75;}
+  .hint-content.open{display:block;}
+  .hl{color:#e0f0ff;font-weight:600;}
+  .unlocked-tag{font-family:'Share Tech Mono',monospace;font-size:9px;color:#39ff14;letter-spacing:0.12em;display:block;margin-bottom:6px;}
+  .overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(3,8,16,0.92);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+  .overlay.on{display:flex;}
+  .modal{background:#0a1628;border-radius:8px;padding:28px 24px;max-width:380px;width:100%;box-shadow:0 0 60px rgba(0,0,0,0.8);position:relative;}
+  .modal::before{content:'';display:block;height:2px;position:absolute;top:0;left:0;right:0;border-radius:8px 8px 0 0;}
+  .modal-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px;display:block;}
+  .modal-q{font-size:28px;font-weight:700;color:#e0f0ff;text-align:center;margin:16px 0 20px;letter-spacing:0.05em;}
+  .modal input{width:100%;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:4px;color:#00d4ff;font-family:'Share Tech Mono',monospace;font-size:22px;letter-spacing:0.2em;padding:12px 14px;outline:none;text-align:center;margin-bottom:8px;transition:border-color 0.2s,box-shadow 0.2s;}
+  .modal input:focus{border-color:#00d4ff;box-shadow:0 0 12px rgba(0,212,255,0.15);}
+  .modal input.wrong{border-color:#ff3e6c;animation:shake 0.3s;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .modal-err{font-family:'Share Tech Mono',monospace;font-size:11px;color:#ff3e6c;text-align:center;min-height:18px;margin-bottom:10px;}
+  .modal-ok{width:100%;color:white;border:none;border-radius:4px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;}
+  .modal-ok:hover{opacity:0.85;}
+  .modal-cancel{width:100%;background:transparent;color:#4a6080;border:1px solid rgba(255,255,255,0.07);border-radius:4px;padding:9px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;cursor:pointer;margin-top:8px;transition:all 0.2s;}
+  .modal-cancel:hover{color:#c8e0f4;border-color:rgba(255,255,255,0.2);}
+
+  /* Color theme */
+  .badge{ background:#C00000; }
+  .task-box{ border:1px solid rgba(192,0,0,0.35); box-shadow:0 4px 24px rgba(192,0,0,0.15); }
+  .task-box::before{ background:linear-gradient(90deg,transparent,#C00000,transparent); }
+  .task-label{ color:#ff8080; }
+  .face{ box-shadow:0 8px 48px rgba(0,0,0,0.7),0 0 0 1px rgba(192,0,0,0.35); }
+  .hint-row:hover{ border-color:rgba(192,0,0,0.35); }
+  .hint-num{ background:#C00000; }
+  .hint-meta-label{ color:#ff8080; }
+  .modal{ border:1px solid #C00000; box-shadow:0 0 60px rgba(192,0,0,0.15); }
+  .modal::before{ background:linear-gradient(90deg,transparent,#C00000,transparent); }
+  .modal-label{ color:#ff8080; }
+  .modal-ok{ background:#C00000; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">■ GRUPPE ROT // LEVEL 01</div>
+  <div class="title">SYSTEM OVERRIDE // Farbcode-Rätsel</div>
+</div>
+
+<div class="flip-wrap" onclick="this.querySelector('.card').classList.toggle('flipped')">
+  <div class="card">
+    <div class="face"><img src="postkarte_rot_vorne.png" alt="Vorderseite"></div>
+    <div class="face back"><img src="postkarte_rot_hinten.png" alt="Rückseite"></div>
+  </div>
+</div>
+
+<div class="flip-bar">Auf die Karte tippen zum Umdrehen</div>
+
+<div class="task-box">
+  <div class="task-inner">
+    <span class="task-label">// Eure Aufgabe – Gruppe ROT</span>
+    <div class="main-task">Lest den Text auf der Rückseite der Postkarte sorgfältig durch.</div>
+    <div class="hints">
+
+      <div class="hint-row" id="row1">
+        <div class="hint-trigger" onclick="openModal(1)">
+          <div class="hint-num">1</div>
+          <div class="hint-meta">
+            <div class="hint-meta-label">▸ Hinweis 1 freischalten</div>
+            <div class="hint-meta-q">Was ist 12 + 9 ?</div>
+          </div>
+          <div class="hint-lock" id="lock1">🔒</div>
+        </div>
+        <div class="hint-content" id="content1">
+          <span class="unlocked-tag">✓ HINWEIS 1 FREIGESCHALTET</span>
+          Manche Buchstaben im Text sind <span class="hl">falsch groß- oder kleingeschrieben</span>.
+          Sammelt alle falsch geschriebenen Buchstaben in der richtigen Reihenfolge –
+          sie ergeben ein <span class="hl">geheimes Wort</span>.
+        </div>
+      </div>
+
+      <div class="hint-row" id="row2">
+        <div class="hint-trigger" onclick="openModal(2)">
+          <div class="hint-num">2</div>
+          <div class="hint-meta">
+            <div class="hint-meta-label">▸ Hinweis 2 freischalten</div>
+            <div class="hint-meta-q">Was ist 4 × 5 ?</div>
+          </div>
+          <div class="hint-lock" id="lock2">🔒</div>
+        </div>
+        <div class="hint-content" id="content2">
+          <span class="unlocked-tag">✓ HINWEIS 2 FREIGESCHALTET</span>
+          Dreht die Karte um und schaut euch die <span class="hl">Vorderseite</span> an.
+          Zählt, wie oft das gesuchte Tier / Objekt vorkommt.
+          Diese Zahl ist <span class="hl">eure Ziffer für den PIN</span>.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <span class="modal-label" id="modal-label">Hinweis freischalten</span>
+    <div class="modal-q" id="modal-q"></div>
+    <input type="number" id="modal-input" placeholder="?" onkeydown="if(event.key==='Enter')check()">
+    <div class="modal-err" id="modal-err"></div>
+    <button class="modal-ok" onclick="check()">BESTÄTIGEN</button>
+    <button class="modal-cancel" onclick="closeModal()">Abbrechen</button>
+  </div>
+</div>
+
+<script>
+
+var H = {1:{q:"12 + 9",a:21},2:{q:"4 × 5",a:20}};
+var cur = null;
+function openModal(n) {
+  var content = document.getElementById('content'+n);
+  if (content && content.classList.contains('open')) return;
+  cur = n;
+  document.getElementById('modal-label').textContent = 'HINWEIS ' + n + ' – Rechenaufgabe lösen';
+  document.getElementById('modal-q').textContent = 'Was ist ' + H[n].q + ' ?';
+  document.getElementById('modal-input').value = '';
+  document.getElementById('modal-err').textContent = '';
+  document.getElementById('modal-input').className = '';
+  document.getElementById('overlay').classList.add('on');
+  setTimeout(function(){ document.getElementById('modal-input').focus(); }, 120);
+}
+function closeModal() {
+  document.getElementById('overlay').classList.remove('on');
+  cur = null;
+}
+function check() {
+  var v = parseInt(document.getElementById('modal-input').value);
+  if (v === H[cur].a) {
+    closeModal();
+    document.getElementById('content'+cur).classList.add('open');
+    document.getElementById('lock'+cur).textContent = '🔓';
+    document.getElementById('row'+cur).style.borderColor = 'rgba(57,255,20,0.25)';
+  } else {
+    var inp = document.getElementById('modal-input');
+    inp.className = 'wrong';
+    document.getElementById('modal-err').textContent = '✗ Nicht ganz – versuch es nochmal!';
+    setTimeout(function(){ inp.className = ''; }, 500);
+  }
+}
+document.getElementById('overlay').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+</script>
+</body>
+</html>
