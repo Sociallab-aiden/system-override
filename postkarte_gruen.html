@@ -144,42 +144,59 @@
 </div>
 
 <script>
+// Answers stored directly, no global cur needed
+var ANSWERS = { 1: 21, 2: 25 };
+var activeHint = 0;
 
-var H = {1:{q:"14 + 7",a:21},2:{q:"5 × 5",a:25}};
-var cur = null;
 function openModal(n) {
-  var content = document.getElementById('content'+n);
-  if (content && content.classList.contains('open')) return;
-  cur = n;
-  document.getElementById('modal-label').textContent = 'HINWEIS ' + n + ' – Rechenaufgabe lösen';
-  document.getElementById('modal-q').textContent = 'Was ist ' + H[n].q + ' ?';
+  if (document.getElementById('content' + n).classList.contains('open')) return;
+  activeHint = n;
+  var questions = { 1: '14 + 7', 2: '5 x 5' };
+  document.getElementById('modal-label').textContent = 'HINWEIS ' + n + ' freischalten';
+  document.getElementById('modal-q').textContent = 'Was ist ' + questions[n] + ' ?';
   document.getElementById('modal-input').value = '';
   document.getElementById('modal-err').textContent = '';
   document.getElementById('modal-input').className = '';
   document.getElementById('overlay').classList.add('on');
-  setTimeout(function(){ document.getElementById('modal-input').focus(); }, 120);
+  setTimeout(function() { document.getElementById('modal-input').focus(); }, 120);
 }
+
 function closeModal() {
   document.getElementById('overlay').classList.remove('on');
-  cur = null;
+  activeHint = 0;
 }
+
 function check() {
+  if (activeHint === 0) return;
+  var n = activeHint;
   var v = parseInt(document.getElementById('modal-input').value);
-  if (v === H[cur].a) {
-    closeModal();
-    document.getElementById('content'+cur).classList.add('open');
-    document.getElementById('lock'+cur).textContent = '🔓';
-    document.getElementById('row'+cur).style.borderColor = 'rgba(57,255,20,0.25)';
+  if (isNaN(v)) {
+    document.getElementById('modal-err').textContent = '✗ Bitte eine Zahl eingeben!';
+    return;
+  }
+  if (v === ANSWERS[n]) {
+    document.getElementById('overlay').classList.remove('on');
+    activeHint = 0;
+    document.getElementById('content' + n).classList.add('open');
+    document.getElementById('lock' + n).textContent = '\uD83D\uDD13';
+    document.getElementById('row' + n).style.borderColor = 'rgba(57,255,20,0.25)';
   } else {
     var inp = document.getElementById('modal-input');
     inp.className = 'wrong';
     document.getElementById('modal-err').textContent = '✗ Nicht ganz – versuch es nochmal!';
-    setTimeout(function(){ inp.className = ''; }, 500);
+    setTimeout(function() { inp.className = ''; }, 500);
   }
 }
-document.getElementById('overlay').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
-document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
 
+document.getElementById('modal-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') check();
+});
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
 </script>
 </body>
 </html>
