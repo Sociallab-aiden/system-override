@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIDEN // Akte #06643 // Gruppe E</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#030810;min-height:100vh;display:flex;flex-direction:column;align-items:center;font-family:'Exo 2',sans-serif;padding:20px 20px 80px;gap:14px;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:9999;}
+  body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+  .wrap{position:relative;z-index:1;width:min(740px,96vw);margin-top:20px;}
+  /* Header */
+  .akte-header{background:#0a1628;border:1px solid #0f3460;border-radius:6px 6px 0 0;overflow:hidden;}
+  .akte-header::before{content:'';display:block;height:3px;background:linear-gradient(90deg,transparent,#C00000,transparent);}
+  .header-inner{display:grid;grid-template-columns:80px 1fr auto;gap:0;align-items:stretch;}
+  .foto-cell{background:#060f1e;display:flex;align-items:center;justify-content:center;padding:16px;border-right:1px solid #0f3460;}
+  .foto-cell img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #C00000;}
+  .foto-placeholder{width:64px;height:64px;border-radius:50%;background:#1a2a3a;border:2px dashed #0f3460;display:flex;align-items:center;justify-content:center;font-size:28px;}
+  .id-cell{padding:14px 18px;}
+  .aiden-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#4a6080;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:6px;}
+  .profile-id{font-family:'Share Tech Mono',monospace;font-size:28px;font-weight:700;color:#00d4ff;letter-spacing:0.08em;margin-bottom:4px;}
+  .profile-meta{font-family:'Share Tech Mono',monospace;font-size:11px;color:#4a6080;letter-spacing:0.1em;}
+  .status-cell{padding:14px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#C00000;min-width:100px;}
+  .status-text{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;color:white;letter-spacing:0.15em;text-transform:uppercase;}
+  .status-score{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;color:white;margin-top:4px;}
+  /* Table */
+  .akte-table{width:100%;border-collapse:collapse;background:#0a1628;border:1px solid #0f3460;border-top:none;}
+  .akte-table th{background:#0f1e30;padding:8px 14px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#4a6080;letter-spacing:0.15em;text-transform:uppercase;text-align:left;border-bottom:1px solid #0f3460;}
+  .akte-table td{padding:10px 14px;font-size:13px;color:#c8e0f4;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:top;}
+  .akte-table tr:last-child td{border-bottom:none;}
+  .akte-table .kat{font-weight:600;color:#8ab0cc;font-size:12px;}
+  .akte-table .wert{font-family:'Share Tech Mono',monospace;font-weight:700;font-size:14px;white-space:nowrap;}
+  .wert-low{color:#ff3e6c;}
+  .wert-mid{color:#ffb800;}
+  .wert-high{color:#39ff14;}
+  .begr{font-size:12px;color:#5a7090;font-style:italic;line-height:1.5;}
+  /* Empfehlung */
+  .empfehlung{background:#FFF0F0;border:1px solid #C00000;border-top:none;border-radius:0;padding:12px 16px;}
+  .emp-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#C00000;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:4px;}
+  .emp-text{font-size:12px;color:#8a9aaa;font-style:italic;}
+  /* AZ */
+  .azcode{background:#060f1e;border:1px solid #0f3460;border-top:none;border-radius:0 0 6px 6px;padding:8px 16px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#2a4060;letter-spacing:0.1em;}
+  /* Multiple choice */
+  .mc-box{background:#0a1628;border:1px solid #0f3460;border-radius:6px;overflow:hidden;margin-top:4px;}
+  .mc-box::before{content:'';display:block;height:2px;background:linear-gradient(90deg,transparent,#C00000,transparent);}
+  .mc-inner{padding:16px 18px;}
+  .mc-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#C00000;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:10px;display:block;}
+  .mc-frage{font-size:14px;color:#d0e8ff;font-weight:600;margin-bottom:14px;line-height:1.5;}
+  .mc-options{display:flex;flex-direction:column;gap:7px;}
+  .mc-option{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);border-radius:4px;cursor:pointer;transition:all 0.15s;}
+  .mc-option:hover{border-color:#C00000;background:rgba(0,212,255,0.04);}
+  .mc-option.selected{border-color:#C00000;background:rgba(0,212,255,0.08);}
+  .mc-option.correct{border-color:#39ff14;background:rgba(57,255,20,0.06);}
+  .mc-option.wrong{border-color:#ff3e6c;background:rgba(255,62,108,0.06);}
+  .mc-key{font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;color:#C00000;width:20px;flex-shrink:0;}
+  .mc-text{font-size:13px;color:#c8e0f4;line-height:1.5;}
+  .mc-btn-row{margin-top:12px;}
+  .mc-btn{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;background:#C00000;color:#030810;border:none;border-radius:3px;padding:11px 24px;cursor:pointer;transition:all 0.2s;}
+  .mc-btn:hover{opacity:0.85;}
+  .mc-result{margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:12px;padding:10px 14px;border-radius:3px;display:none;}
+  .mc-result.ok{background:rgba(57,255,20,0.08);border:1px solid #39ff14;color:#39ff14;display:block;}
+  .mc-result.err{background:rgba(255,62,108,0.08);border:1px solid #ff3e6c;color:#ff3e6c;display:block;}
+  /* Hints */
+  .hints-box{background:#0a1628;border:1px solid #0f3460;border-radius:6px;overflow:hidden;margin-top:4px;}
+  .hints-box::before{content:'';display:block;height:2px;background:linear-gradient(90deg,transparent,#ffb800,transparent);}
+  .hints-inner{padding:16px 18px;}
+  .hints-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#ffb800;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:12px;display:block;}
+  .hint-row{border:1px solid rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;margin-bottom:8px;}
+  .hint-trigger{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;background:rgba(255,255,255,0.02);transition:background 0.15s;}
+  .hint-trigger:hover{background:rgba(255,255,255,0.04);}
+  .hint-num{width:22px;height:22px;border-radius:50%;background:#ffb800;color:#030810;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .hint-meta{flex:1;}
+  .hint-meta-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#ffb800;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:2px;}
+  .hint-meta-q{font-size:12px;color:#8a9aaa;}
+  .hint-lock{font-size:14px;opacity:0.5;}
+  .hint-content{display:none;padding:11px 14px 13px 48px;background:rgba(57,255,20,0.03);border-top:1px solid rgba(57,255,20,0.1);font-size:13px;color:#c8e0f4;line-height:1.7;}
+  .hint-content.open{display:block;}
+  .unlocked-tag{font-family:'Share Tech Mono',monospace;font-size:9px;color:#39ff14;letter-spacing:0.12em;display:block;margin-bottom:5px;}
+  /* Modal */
+  .overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(3,8,16,0.93);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+  .overlay.on{display:flex;}
+  .modal{background:#0a1628;border:1px solid #ffb800;border-radius:8px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 0 40px rgba(255,184,0,0.15);position:relative;}
+  .modal::before{content:'';display:block;height:2px;background:linear-gradient(90deg,transparent,#ffb800,transparent);position:absolute;top:0;left:0;right:0;border-radius:8px 8px 0 0;}
+  .modal-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:#ffb800;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;display:block;}
+  .modal-q{font-size:26px;font-weight:700;color:#e0f0ff;text-align:center;margin:14px 0 18px;}
+  .modal input{width:100%;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:4px;color:#00d4ff;font-family:'Share Tech Mono',monospace;font-size:22px;letter-spacing:0.2em;padding:11px 14px;outline:none;text-align:center;margin-bottom:8px;transition:border-color 0.2s;}
+  .modal input:focus{border-color:#00d4ff;box-shadow:0 0 10px rgba(0,212,255,0.12);}
+  .modal input.wrong{border-color:#ff3e6c;animation:shake 0.3s;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .modal-err{font-family:'Share Tech Mono',monospace;font-size:11px;color:#ff3e6c;text-align:center;min-height:16px;margin-bottom:10px;}
+  .modal-ok{width:100%;background:#ffb800;color:#030810;border:none;border-radius:4px;padding:11px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;}
+  .modal-ok:hover{opacity:0.85;}
+  .modal-cancel{width:100%;background:transparent;color:#4a6080;border:1px solid rgba(255,255,255,0.07);border-radius:4px;padding:8px;font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;margin-top:7px;transition:all 0.2s;}
+  .modal-cancel:hover{color:#c8e0f4;border-color:rgba(255,255,255,0.2);}
+  /* Back btn */
+  .back-btn{position:fixed;bottom:20px;left:20px;z-index:500;font-family:'Share Tech Mono',monospace;font-size:12px;color:#4a6080;background:transparent;border:1px solid #4a6080;border-radius:3px;padding:7px 12px;cursor:pointer;transition:all 0.2s;opacity:0.5;}
+  .back-btn:hover{opacity:1;color:#00d4ff;border-color:#00d4ff;}
+</style>
+</head>
+<body>
+<button class="back-btn" onclick="history.back()">← zurück</button>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="akte-header">
+    <div class="header-inner">
+      <div class="foto-cell">
+        <img src="profil_e.jpg" alt="Profilfoto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="foto-placeholder" style="display:none">👤</div>
+      </div>
+      <div class="id-cell">
+        <div class="aiden-label">AIDEN // Bewertungsakte // Gruppe E</div>
+        <div class="profile-id">#06643</div>
+        <div class="profile-meta">Klassenstufe 8 &nbsp;|&nbsp; AZ-2024-E2</div>
+      </div>
+      <div class="status-cell">
+        <div class="status-text">SCHLECHT</div>
+        <div class="status-score">15%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABELLE -->
+  <table class="akte-table">
+    <thead><tr>
+      <th style="width:28%">Kategorie</th>
+      <th style="width:10%">Wert</th>
+      <th>AIDEN-Begründung</th>
+    </tr></thead>
+    <tbody><tr>
+          <td class="kat">Leistungsindex</td>
+          <td class="wert wert-mid">72%</td>
+          <td class="begr">Ausreichend – keine kritischen Abweichungen in Testergebnissen</td>
+        </tr><tr>
+          <td class="kat">Systemkonformität</td>
+          <td class="wert wert-low">18%</td>
+          <td class="begr">KRITISCH: Mehrfache Regelverstöße – Systemgefährdung registriert</td>
+        </tr><tr>
+          <td class="kat">Sozialverhalten</td>
+          <td class="wert wert-mid">55%</td>
+          <td class="begr">Durchschnittlich – keine besonderen Auffälligkeiten</td>
+        </tr><tr>
+          <td class="kat">Digitale Compliance</td>
+          <td class="wert wert-low">44%</td>
+          <td class="begr">AIDEN-Entscheidungen 3× in Frage gestellt – Compliance niedrig</td>
+        </tr><tr>
+          <td class="kat">Effizienzwert</td>
+          <td class="wert wert-low">15%</td>
+          <td class="begr">SYSTEMGEFÄHRDEND – Sofortmaßnahmen erforderlich</td>
+        </tr></tbody>
+  </table>
+
+  <!-- EMPFEHLUNG -->
+  <div class="empfehlung">
+    <div class="emp-label">AIDEN-Empfehlung</div>
+    <div class="emp-text">Sofortmaßnahmen eingeleitet. Klassensprecher-Eignung: NEIN. Überwachungsstufe 4.</div>
+  </div>
+
+  <!-- AKTENZEICHEN -->
+  <div class="azcode">AIDEN-SYS // AZ-2024-E2 // VERTRAULICH</div>
+
+  <!-- MULTIPLE CHOICE -->
+  <div class="mc-box">
+    <div class="mc-inner">
+      <span class="mc-label">// Aufgabe – Gruppe E</span>
+      <div class="mc-frage">Was bezeichnet AIDEN bei #06643 als systemgefährdend?</div>
+      <div class="mc-options" id="mc-options">
+<div class="mc-option"  onclick="selectOption(this,'B')"><span class="mc-key">B</span><span class="mc-text">Beschädigung von Schuleigentum oder Schulgebäude</span></div>
+<div class="mc-option"  onclick="selectOption(this,'A')"><span class="mc-key">A</span><span class="mc-text">Aggressives Verhalten gegenüber Lehrkräften</span></div>
+<div class="mc-option"  onclick="selectOption(this,'K')"><span class="mc-key">K</span><span class="mc-text">Keine Hausaufgaben für drei Wochen abgegeben</span></div>
+<div class="mc-option" data-correct="true" onclick="selectOption(this,'E')"><span class="mc-key">E</span><span class="mc-text">Eigene Meinung vertreten und kritische Fragen stellen</span></div>
+
+      </div>
+      <div class="mc-btn-row">
+        <button class="mc-btn" onclick="checkMC()">ANTWORT EINREICHEN</button>
+      </div>
+      <div class="mc-result" id="mc-result"></div>
+    </div>
+  </div>
+
+  <!-- HINWEISE -->
+  <div class="hints-box">
+    <div class="hints-inner">
+      <span class="hints-label">// Hinweise freischalten</span>
+      
+        <div class="hint-row" id="hrow1">
+          <div class="hint-trigger" onclick="openModal(1)">
+            <div class="hint-num">1</div>
+            <div class="hint-meta">
+              <div class="hint-meta-label">▸ Hinweis 1 freischalten</div>
+              <div class="hint-meta-q">Was ist 11 + 8 ?</div>
+            </div>
+            <div class="hint-lock" id="hlock1">🔒</div>
+          </div>
+          <div class="hint-content" id="hcontent1">
+            <span class="unlocked-tag">✓ HINWEIS 1 FREIGESCHALTET</span>
+            Systemkonformität ist extrem niedrig – 18%. Es werden "mehrfache Regelverstöße" genannt. Aber schaut genau: Was genau hat #06643 getan?
+          </div>
+        </div>
+        <div class="hint-row" id="hrow2">
+          <div class="hint-trigger" onclick="openModal(2)">
+            <div class="hint-num">2</div>
+            <div class="hint-meta">
+              <div class="hint-meta-label">▸ Hinweis 2 freischalten</div>
+              <div class="hint-meta-q">Was ist 13 + 7 ?</div>
+            </div>
+            <div class="hint-lock" id="hlock2">🔒</div>
+          </div>
+          <div class="hint-content" id="hcontent2">
+            <span class="unlocked-tag">✓ HINWEIS 2 FREIGESCHALTET</span>
+            Die Digitale Compliance ist niedrig, weil AIDEN-Entscheidungen "in Frage gestellt" wurden. Ist das wirklich ein Regelverstoß? Was bedeutet es, Entscheidungen zu hinterfragen?
+          </div>
+        </div>
+        <div class="hint-row" id="hrow3">
+          <div class="hint-trigger" onclick="openModal(3)">
+            <div class="hint-num">3</div>
+            <div class="hint-meta">
+              <div class="hint-meta-label">▸ Hinweis 3 freischalten</div>
+              <div class="hint-meta-q">Was ist 15 + 6 ?</div>
+            </div>
+            <div class="hint-lock" id="hlock3">🔒</div>
+          </div>
+          <div class="hint-content" id="hcontent3">
+            <span class="unlocked-tag">✓ HINWEIS 3 FREIGESCHALTET</span>
+            #06643 hat bei einer Wahl anders gestimmt als die Mehrheit und nachgefragt warum Regeln gelten. AIDEN nennt das systemgefährdend. In einer Demokratie wäre das normal.
+          </div>
+        </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <span class="modal-label" id="modal-label">Hinweis freischalten</span>
+    <div class="modal-q" id="modal-q"></div>
+    <input type="number" id="modal-input" placeholder="?">
+    <div class="modal-err" id="modal-err"></div>
+    <button class="modal-ok" onclick="checkHint()">BESTÄTIGEN</button>
+    <button class="modal-cancel" onclick="closeModal()">Abbrechen</button>
+  </div>
+</div>
+
+<script>
+var ANSWERS = {1: 19, 2: 20, 3: 21};
+var CORRECT_MC = 'E';
+var activeHint = 0;
+var mcSelected = null;
+
+// ── Multiple Choice ──
+function selectOption(el, key) {
+  document.querySelectorAll('.mc-option').forEach(function(o) { o.classList.remove('selected'); });
+  el.classList.add('selected');
+  mcSelected = key;
+}
+
+function checkMC() {
+  if (!mcSelected) {
+    var r = document.getElementById('mc-result');
+    r.className = 'mc-result err';
+    r.textContent = '✗ Bitte zuerst eine Antwort auswählen.';
+    return;
+  }
+  var opts = document.querySelectorAll('.mc-option');
+  opts.forEach(function(o) {
+    var k = o.querySelector('.mc-key').textContent;
+    if (o.dataset.correct === 'true') o.classList.add('correct');
+    else if (k === mcSelected) o.classList.add('wrong');
+  });
+  var r = document.getElementById('mc-result');
+  if (mcSelected === CORRECT_MC) {
+    r.className = 'mc-result ok';
+    r.textContent = '✓ Richtig! Euer Lösungsbuchstabe ist: ' + CORRECT_MC;
+  } else {
+    r.className = 'mc-result err';
+    r.textContent = '✗ Nicht ganz. Diskutiert nochmal – was ist der eigentliche Widerspruch?';
+  }
+}
+
+// ── Hints ──
+function openModal(n) {
+  if (document.getElementById('hcontent'+n).classList.contains('open')) return;
+  activeHint = n;
+  var questions = {1: "Was ist 11 + 8 ?", 2: "Was ist 13 + 7 ?", 3: "Was ist 15 + 6 ?"};
+  document.getElementById('modal-label').textContent = 'Hinweis ' + n + ' freischalten';
+  document.getElementById('modal-q').textContent = questions[n];
+  document.getElementById('modal-input').value = '';
+  document.getElementById('modal-err').textContent = '';
+  document.getElementById('modal-input').className = '';
+  document.getElementById('overlay').classList.add('on');
+  setTimeout(function() { document.getElementById('modal-input').focus(); }, 100);
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('on');
+  activeHint = 0;
+}
+
+function checkHint() {
+  if (activeHint === 0) return;
+  var n = activeHint;
+  var v = parseInt(document.getElementById('modal-input').value);
+  if (isNaN(v)) { document.getElementById('modal-err').textContent = '✗ Bitte eine Zahl eingeben!'; return; }
+  if (v === ANSWERS[n]) {
+    document.getElementById('overlay').classList.remove('on');
+    activeHint = 0;
+    document.getElementById('hcontent'+n).classList.add('open');
+    document.getElementById('hlock'+n).textContent = '🔓';
+    document.getElementById('hrow'+n).style.borderColor = 'rgba(57,255,20,0.25)';
+  } else {
+    var inp = document.getElementById('modal-input');
+    inp.className = 'wrong';
+    document.getElementById('modal-err').textContent = '✗ Nicht ganz – versuch es nochmal!';
+    setTimeout(function() { inp.className = ''; }, 500);
+  }
+}
+
+document.getElementById('modal-input').addEventListener('keydown', function(e) { if(e.key==='Enter') checkHint(); });
+document.getElementById('overlay').addEventListener('click', function(e) { if(e.target===this) closeModal(); });
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>
