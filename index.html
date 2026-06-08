@@ -193,15 +193,6 @@
     .input-row{flex-direction:column;}
     .profiles-grid{grid-template-columns:repeat(3,1fr);}
   }
-
-  .profile-link { text-decoration: none; cursor: pointer; transition: all 0.2s; }
-  .profile-link:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,212,255,0.15); }
-  .profile-sketch .avatar img { width:36px;height:36px;border-radius:50%;object-fit:cover; }
-  .pscore.bad { color: var(--accent2); }
-  .pscore.good { color: var(--accent3); }
-  .popen { font-family:'Share Tech Mono',monospace; font-size:9px; color:var(--accent); letter-spacing:0.1em; margin-top:6px; opacity:0; transition:opacity 0.2s; }
-  .profile-link:hover .popen { opacity:1; }
-
 </style>
 </head>
 <body>
@@ -330,13 +321,28 @@
       <strong style="color:var(--accent)">Farbgruppen:</strong> Sucht in eurem zugewiesenen Bereich nach dem QR-Code eurer Farbe. Scannt ihn, löst das Rätsel, notiert eure Zahl.<br><br>
       Kommt zurück – alle vier Zahlen zusammen ergeben den PIN.
     </p>
+    <div style="display: flex; gap: 10px;">
+      <a href="https://sociallab-aiden.github.io/system-override/postkarte_rot.html">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background-color: red;"></div>
+      </a>
+      <a href="https://sociallab-aiden.github.io/system-override/postkarte_blau.html">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background-color: blue;"></div>
+      </a>
+      <a href="https://sociallab-aiden.github.io/system-override/postkarte_gelb.html">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background-color: yellow;"></div>
+      </a>
+      <a href="https://sociallab-aiden.github.io/system-override/postkarte_gruen.html">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background-color: green;"></div>
+      </a>
+    </div>
+
 
     <div class="input-row">
       <input type="text" id="l1-input" placeholder="4-STELLIGER PIN" maxlength="4">
       <button class="btn btn-primary" onclick="checkLevel1()">ENTER</button>
     </div>
     <div id="l1-msg" class="msg"></div>
-    <p class="hint-text">Vier Zahlen direkt hintereinander, z.B. 2847</p>
+    <p class="hint-text">Vier Zahlen direkt hintereinander. </p>
   </div>
 </div>
 
@@ -369,31 +375,31 @@
 
     <div class="profiles-grid">
       <a href="akte_a.html" target="_blank" class="profile-sketch profile-link">
-        <div class="avatar"><img src="profil_a.png" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>
+        <div class="avatar"><img src="profil_a.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>
         <div class="pid">#04471</div><div class="pscore bad">23%</div>
         <div class="pstatus">SCHLECHT</div><div class="pgroup">GRUPPE A</div>
         <div class="popen">AKTE ÖFFNEN ↗</div>
       </a>
       <a href="akte_b.html" target="_blank" class="profile-sketch profile-link">
-        <div class="avatar"><img src="profil_b.png" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>
+        <div class="avatar"><img src="profil_b.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>
         <div class="pid">#03317</div><div class="pscore good">89%</div>
         <div class="pstatus">GUT</div><div class="pgroup">GRUPPE B</div>
         <div class="popen">AKTE ÖFFNEN ↗</div>
       </a>
       <a href="akte_c.html" target="_blank" class="profile-sketch profile-link">
-        <div class="avatar"><img src="profil_c.png" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>
+        <div class="avatar"><img src="profil_c.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>
         <div class="pid">#05582</div><div class="pscore bad">31%</div>
         <div class="pstatus">SCHLECHT</div><div class="pgroup">GRUPPE C</div>
         <div class="popen">AKTE ÖFFNEN ↗</div>
       </a>
       <a href="akte_d.html" target="_blank" class="profile-sketch profile-link">
-        <div class="avatar"><img src="profil_d.png" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>
+        <div class="avatar"><img src="profil_d.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>
         <div class="pid">#02241</div><div class="pscore good">76%</div>
         <div class="pstatus">GUT</div><div class="pgroup">GRUPPE D</div>
         <div class="popen">AKTE ÖFFNEN ↗</div>
       </a>
       <a href="akte_e.html" target="_blank" class="profile-sketch profile-link">
-        <div class="avatar"><img src="profil_e.png" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>
+        <div class="avatar"><img src="profil_e.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>
         <div class="pid">#06643</div><div class="pscore bad">15%</div>
         <div class="pstatus">SCHLECHT</div><div class="pgroup">GRUPPE E</div>
         <div class="popen">AKTE ÖFFNEN ↗</div>
@@ -808,7 +814,7 @@ function toggleMayaIntro(){
 }
 
 // ═══ PASSWORDS ═══════════════════════════════════
-const PW = { l1:'1234', l2:'WERTE', l3:'RECHT', l4:'7X-K3-M9' };
+const PW = { l1:'5834', l2:'WERTE', l3:'RECHT', l4:'7X-K3-M9' };
 
 // ═══ LEVEL 3 RULES ═══════════════════════════════
 const RULES = [
@@ -857,9 +863,9 @@ const QUESTIONS = [
 let l3Crossed=new Set(), l4Flagged=new Set(), overrideData={};
 let wrongAttempts={l1:0,l2:0,l3:0,l4:0};
 const SONDER=[
-  ['Steht auf – klopft eurem Sitznachbar auf die Schulter.','Nennt reihum je einen Begriff zu „Fairness".','Einigt euch auf eine Schulregel, die ihr sofort ändern würdet.'],
-  ['Wählt eine:n Sprecher:in für die nächste Runde.','Nennt je ein Wort, das AIDEN nie verstehen würde.','Macht gemeinsam 10 Sekunden absolute Stille.'],
-  ['Stellt euch vor: Name + Lieblingsschulfach.','Einigt euch auf ein Tier, das AIDEN wäre – und warum.','Jede:r sagt eine Sache, die sie/er an der Klasse schätzt.'],
+  ['Einigt euch auf ein Tier. Macht 10 Sekunden lang gemeinsam das Geräusch dieses Tieres.','Findet einen Gegenstand, der absolut lautlos ist.','Erzählt einen Witz'],
+  ['Sagt dreimal schnell: „Fischers Fritz fischt frische Fische“.','Bewegt euch 10 Sekunden lang wie ein Roboter.','Macht gemeinsam 10 Sekunden absolute Stille.'],
+  ['Stellt euch vor: Name + Lieblingsschulfach.','Freeze! Bleibt 10 Sekunden lang komplett still stehen.','Jede:r sagt eine Sache, die sie/er an der Klasse schätzt.'],
 ];
 
 function showSonder(level){
