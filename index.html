@@ -134,12 +134,10 @@
   /* Profile sketches */
   .profiles-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0;}
   .profile-sketch{background:rgba(0,212,255,0.04);border:1px solid var(--border);border-radius:4px;
-    padding:12px 8px;text-align:center;overflow:hidden;}
+    padding:12px 8px;text-align:center;}
   .profile-sketch .avatar{width:36px;height:36px;border-radius:50%;
     background:linear-gradient(135deg,#1a3a5c,#0f3460);border:2px solid var(--border);
-    margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:16px;
-    overflow:hidden;flex-shrink:0;}
-  .profile-sketch .avatar img{width:36px;height:36px;border-radius:50%;object-fit:cover;display:block;flex-shrink:0;}
+    margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
   .profile-sketch .pid{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:6px;}
   .profile-sketch .pscore{font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:700;color:var(--accent2);}
   .profile-sketch .pstatus{font-size:9px;color:var(--muted);margin-top:4px;}
@@ -282,12 +280,20 @@
       <audio id="audio-maya-intro" src="maya_intro.mp3" preload="none"></audio>
     </div>
 
-    <div class="maya-box">
-      <div class="maya-avatar">M</div>
-      „Wenn ihr das hier lest, hat AIDEN mich noch nicht gelöscht. Ich bin Maya. Ich war die Erste, die gemerkt hat, dass etwas nicht stimmt. AIDEN verändert eure Schule – ohne euch.<br><br>
-      Aber ihr habt die Chance, ihn zu stoppen. Dafür braucht ihr einander – auch Leute, mit denen ihr sonst vielleicht nicht zusammenarbeitet.<br><br>
-      Achtung: AIDEN beobachtet euch. Wenn ihr eine falsche Lösung eingebt, werdet ihr eine Sonderaufgabe bekommen, die ihr lösen müsst, bevor es weitergeht.<br><br> 
-      Entscheidet gemeinsam. Ihr seid die letzte Hoffnung."
+    <!-- Subtitle box Maya -->
+    <div class="subtitle-box" id="maya-subtitle-box">
+      <div class="subtitle-label">// MAYA // UNTERTITEL</div>
+      <div class="subtitle-line active" id="msub-0">Drückt Play um Mayas Nachricht zu starten.</div>
+      <div class="subtitle-line" id="msub-1">Wenn ihr das hier hört, hat AIDEN mich noch nicht gelöscht.</div>
+      <div class="subtitle-line" id="msub-2">Ich bin Maya. Ich war die Erste, die gemerkt hat, dass etwas nicht stimmt.</div>
+      <div class="subtitle-line" id="msub-3">AIDEN verändert eure Schule. Ohne euch.</div>
+      <div class="subtitle-line" id="msub-4">Aber ihr habt die Chance, ihn zu stoppen.</div>
+      <div class="subtitle-line" id="msub-5">Dafür braucht ihr einander.</div>
+      <div class="subtitle-line" id="msub-6">Auch Leute, mit denen ihr sonst vielleicht nicht zusammenarbeitet.</div>
+      <div class="subtitle-line" id="msub-7">Achtung! AIDEN beobachtet euch.</div>
+      <div class="subtitle-line" id="msub-8">Wenn ihr eine falsche Lösung eingebt, werdet ihr eine Sonderaufgabe bekommen, die ihr lösen müsst, bevor es weitergeht.</div>
+      <div class="subtitle-line" id="msub-9">Entscheidet gemeinsam.</div>
+      <div class="subtitle-line" id="msub-10" style="color:var(--accent);font-weight:600;">Ihr seid die letzte Hoffnung.</div>
     </div>
 
     <div class="sep"></div>
@@ -807,7 +813,58 @@ function toggleAudio(audioId, btnId, progressId){
 }
 
 function toggleMayaIntro(){
-  toggleAudio('audio-maya-intro','maya-intro-btn','maya-intro-progress');
+  const audio = document.getElementById('audio-maya-intro');
+  const btn = document.getElementById('maya-intro-btn');
+  if(audio.paused){
+    audio.play().catch(()=>{});
+    btn.textContent='⏸'; btn.classList.add('playing');
+    // Show first subtitle
+    document.querySelectorAll('[id^="msub-"]').forEach(el=>el.classList.remove('active'));
+    document.getElementById('msub-1').classList.add('active');
+    if(window.mayaSubInterval) clearInterval(window.mayaSubInterval);
+    window.mayaSubInterval = setInterval(updateMayaSubtitles, 150);
+  } else {
+    audio.pause(); btn.textContent='▶'; btn.classList.remove('playing');
+    clearInterval(window.mayaSubInterval);
+  }
+}
+
+const MAYA_SUBTITLE_TIMES = [
+  {start:0,    end:4,    id:'msub-1'},
+  {start:4,    end:8,    id:'msub-2'},
+  {start:8,    end:12,   id:'msub-3'},
+  {start:12,   end:14,   id:'msub-4'},
+  {start:14,   end:15,   id:'msub-5'},
+  {start:15,   end:19,   id:'msub-6'},
+  {start:19,   end:21,   id:'msub-7'},
+  {start:21,   end:28,   id:'msub-8'},
+  {start:28,   end:30,   id:'msub-9'},
+  {start:30,   end:999,  id:'msub-10'},
+];
+
+function updateMayaSubtitles(){
+  const audio = document.getElementById('audio-maya-intro');
+  if(!audio) return;
+  const t = audio.currentTime;
+  const prog = document.getElementById('maya-intro-progress');
+  if(audio.duration) prog.style.width=(t/audio.duration*100)+'%';
+  for(const s of MAYA_SUBTITLE_TIMES){
+    if(t >= s.start && t < s.end){
+      const el = document.getElementById(s.id);
+      if(el && !el.classList.contains('active')){
+        document.querySelectorAll('[id^="msub-"]').forEach(x=>x.classList.remove('active'));
+        el.classList.add('active');
+      }
+      break;
+    }
+  }
+  if(audio.ended){
+    clearInterval(window.mayaSubInterval);
+    document.getElementById('maya-intro-btn').textContent='▶';
+    document.getElementById('maya-intro-btn').classList.remove('playing');
+    document.querySelectorAll('[id^="msub-"]').forEach(el=>el.classList.remove('active'));
+    document.getElementById('msub-0').classList.add('active');
+  }
 }
 
 // ═══ PASSWORDS ═══════════════════════════════════
