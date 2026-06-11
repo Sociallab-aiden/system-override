@@ -134,13 +134,20 @@
   /* Profile sketches */
   .profiles-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0;}
   .profile-sketch{background:rgba(0,212,255,0.04);border:1px solid var(--border);border-radius:4px;
-    padding:12px 8px;text-align:center;}
+    padding:12px 8px;text-align:center;overflow:hidden;}
   .profile-sketch .avatar{width:36px;height:36px;border-radius:50%;
     background:linear-gradient(135deg,#1a3a5c,#0f3460);border:2px solid var(--border);
-    margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+    margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:16px;
+    overflow:hidden;flex-shrink:0;}
+  .profile-sketch .avatar img{width:36px;height:36px;border-radius:50%;object-fit:cover;display:block;}
   .profile-sketch .pid{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:6px;}
   .profile-sketch .pscore{font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:700;color:var(--accent2);}
   .profile-sketch .pstatus{font-size:9px;color:var(--muted);margin-top:4px;}
+  
+  .profile-link{text-decoration:none;cursor:pointer;transition:all 0.2s;}
+  .profile-link:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,212,255,0.15);}
+  .pscore.bad{color:var(--accent2);}
+  .pscore.good{color:var(--accent3);}
   .profile-sketch .pgroup{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);margin-top:6px;}
 
   /* Rules */
@@ -191,7 +198,7 @@
   @media(max-width:600px){
     .container{padding:20px 16px;}
     .input-row{flex-direction:column;}
-    .profiles-grid{grid-template-columns:repeat(3,1fr);}
+    
   }
 </style>
 </head>
