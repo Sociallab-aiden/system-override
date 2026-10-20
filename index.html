@@ -282,8 +282,7 @@
       <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.2em;margin-top:4px;">
         MISSION BRIEFING
       </div>
-      <div id="mode-badge" style="display:inline-block;margin-top:8px;font-family:'Share Tech Mono',monospace;
-        font-size:9px;letter-spacing:0.15em;padding:3px 12px;border-radius:2px;"></div>
+
     </div>
 
     <div class="audio-player">
@@ -1028,19 +1027,6 @@ function doOverride(){
 }
 
 
-// Mode badge
-(function() {
-  var b = document.getElementById('mode-badge');
-  if(b) {
-    if(gameMode === 'short') {
-      b.textContent = '⏱ VARIANTE: 90 MIN';
-      b.style.cssText = 'background:rgba(0,212,255,0.1);border:1px solid var(--accent);color:var(--accent);display:inline-block;margin-top:8px;font-family:Share Tech Mono,monospace;font-size:9px;letter-spacing:0.15em;padding:3px 12px;border-radius:2px;';
-    } else {
-      b.textContent = '⏱ VARIANTE: 90 MIN+';
-      b.style.cssText = 'background:rgba(57,255,20,0.08);border:1px solid var(--accent3);color:var(--accent3);display:inline-block;margin-top:8px;font-family:Share Tech Mono,monospace;font-size:9px;letter-spacing:0.15em;padding:3px 12px;border-radius:2px;';
-    }
-  }
-})();
 // ═══ INIT ════════════════════════════════════════
 renderRules(); renderQuestions(); updateL3(); updateL4();
 </script>
