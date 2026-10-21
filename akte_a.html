@@ -22,7 +22,8 @@
     font-size:11px;letter-spacing:0.15em;padding:4px 16px;border-radius:2px;margin-bottom:8px;}
   .title{color:#00d4ff;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;}
 
-  .flip-wrap{position:relative;z-index:1;width:min(720px,95vw);aspect-ratio:4/3;
+  .flip-wrap{position:relative;z-index:1;
+    width:min(560px,95vw,calc((100vh - 190px) * 0.7071));aspect-ratio:210/297;
     perspective:1200px;cursor:pointer;}
   .card{width:100%;height:100%;position:relative;transform-style:preserve-3d;
     transition:transform 0.75s cubic-bezier(0.4,0,0.2,1);border-radius:12px;}
@@ -31,14 +32,14 @@
     backface-visibility:hidden;-webkit-backface-visibility:hidden;
     border-radius:12px;overflow:hidden;
     box-shadow:0 8px 48px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.04);}
-  .face img{width:100%;height:100%;object-fit:cover;display:block;}
+  .face img{width:100%;height:100%;object-fit:contain;display:block;}
   .face-back{transform:rotateY(180deg);}
   .img-placeholder{width:100%;height:100%;background:#0a1628;
     display:flex;align-items:center;justify-content:center;
     font-family:'Share Tech Mono',monospace;font-size:11px;color:#0f3460;
     flex-direction:column;gap:8px;}
 
-  .flip-bar{position:relative;z-index:1;width:min(720px,95vw);
+  .flip-bar{position:relative;z-index:1;width:min(560px,95vw);
     display:flex;align-items:center;justify-content:center;gap:8px;
     font-family:'Share Tech Mono',monospace;font-size:11px;color:#2a4060;letter-spacing:0.1em;}
   .flip-bar::before,.flip-bar::after{content:'';flex:1;height:1px;
